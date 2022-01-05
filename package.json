@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "express": "^4.17.2",
+    "unirest": "^0.6.0"
+  },
+  "name": "headtohead_backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/yjason12/headtohead_backend.git",
+  "author": "TrevorGuo <trevorguo@gmail.com>",
+  "license": "MIT"
+}
