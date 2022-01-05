@@ -8,5 +8,6 @@
   "main": "index.js",
   "repository": "https://github.com/yjason12/headtohead_backend.git",
   "author": "TrevorGuo <trevorguo@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "socket.io": "^4.4.0"
 }
