@@ -1,13 +1,26 @@
 {
   "dependencies": {
     "express": "^4.17.2",
+    "socket.io": "^4.4.0",
     "unirest": "^0.6.0"
   },
   "name": "headtohead_backend",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "https://github.com/yjason12/headtohead_backend.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yjason12/headtohead_backend.git"
+  },
   "author": "TrevorGuo <trevorguo@gmail.com>",
   "license": "MIT",
-  "socket.io": "^4.4.0"
+  "scripts": {
+    "start": "node server.js"
+  },
+  "description": "backend repository",
+  "bugs": {
+    "url": "https://github.com/yjason12/headtohead_backend/issues"
+  },
+  "homepage": "https://github.com/yjason12/headtohead_backend#readme",
+  "devDependencies": {},
+  "keywords": []
 }
