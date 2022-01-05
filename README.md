@@ -1,2 +1,2 @@
-# HeadToHeadBackend
+# headtohead_backend
 backend repository
