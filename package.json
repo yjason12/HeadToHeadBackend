@@ -14,13 +14,15 @@
   "author": "TrevorGuo <trevorguo@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "description": "backend repository",
   "bugs": {
     "url": "https://github.com/yjason12/headtohead_backend/issues"
   },
   "homepage": "https://github.com/yjason12/headtohead_backend#readme",
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
   "keywords": []
 }
