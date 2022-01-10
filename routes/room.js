@@ -6,7 +6,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/:roomName", (req, res) => {
-    res.send(`Welcome to ${req.params.roomNamek}`)
+    res.send(`Welcome to ${req.params.roomName}`)
 })
 
 module.exports = router;

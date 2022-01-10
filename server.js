@@ -14,6 +14,23 @@ io.on('connection', function(socket) {
    socket.on('disconnect', function () {
       console.log('A user disconnected');
    });
+
+   /**
+   socket.on('messagetoserver', (msg) => {
+      console.log(socket.id)
+      console.log(msg["id"])
+      console.log('got the message');
+      io.emit('message out', {
+         result: "success",
+
+      });
+    });*/
+
+    socket.on('test', (roomInfo) => {
+      console.log('michael connect to yongjae');
+      io.emit('test', "!we did it!");
+    });
+
 });
 
 http.listen(3001, function() {
