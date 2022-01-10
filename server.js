@@ -1,7 +1,15 @@
 const app = require('express')();
 const http = require('http').Server(app);
-const io = require('socket.io')(http);
+const io = require("socket.io")(http, {
+   cors: {
+     origin: "*",
+     methods: ["GET", "POST"]
+   }
+ });
 
+var cors = require('cors')
+
+app.use(cors())
 app.get('/', function(req, res) {
    res.send("pong");
 });
