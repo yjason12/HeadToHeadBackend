@@ -20,27 +20,29 @@ app.get('/', function (req, res) {
     res.send("pong");
 });
 
+
+
 io.on('connection', function (socket) {
-    logger.info(`A user (${socket.id}) connected`);
+    logger.info(`User (${socket.id}) has connected`);
 
     socket.on('disconnect', function () {
-        logger.info(`A user (${socket.id}) has disconnected`);
+        logger.info(`User (${socket.id}) has disconnected`);
 
         if (!(socket.id in idToPlayer)) {
-            logger.error(`An unrecognized player (${socket.id}) has disconnected (somehow)`);
+            logger.error(`Unrecognized player (${socket.id}) has disconnected (somehow)`);
             return;
         }
 
         const disconnectedPlayer = idToPlayer[socket.id];
         if (disconnectedPlayer["room"] == null) {
-            logger.error(`A player (${socket.id}) without a room has disconnected (somehow)`);
+            logger.error(`Player (${socket.id}) without a room has disconnected (somehow)`);
             return;
         }
         const disconnectedRoom = disconnectedPlayer["room"];
         disconnectedPlayer.disconnect();
 
-        if (rooms[disconnectedRoom].length == 0) {
-            delete rooms[disconnectedRoom];
+        if (disconnectedRoom["players"].length == 0) {
+            delete rooms[disconnectedRoom["id"]];
             logger.info(`${disconnectedRoom} has been deleted due to lack of players.`);
         }
         delete idToPlayer[socket.id]
@@ -48,28 +50,67 @@ io.on('connection', function (socket) {
     });
 
     socket.on('roomRequest', (roomInfo) => {
-        if (!("roomID" in roomInfo)) return;
-        if (!("nickname" in roomInfo)) return;
-        // TODO: validate roomID and nickanmes -- don't let them be empty or non-alphanum chars
+
+
+        if (!("roomID" in roomInfo)) {
+            logger.warn("Invalid JSON was sent to roomRequest: Missing roomID")
+            return;
+        }
+        if (!("nickname" in roomInfo)) {
+            logger.warn("Invalid JSON was sent to roomRequest: Missing nickname")
+            return;
+        }
 
         const roomID = roomInfo['roomID'];
         const nickname = roomInfo['nickname'];
 
+        function isValidRoomID(roomID) {
+            if (roomID.length < 2 || roomID.length > 15) return false;
+            if (!roomID.match(/^[0-9a-zA-Z]+$/)) return false;
+            return true;
+        }
+
+        if (!isValidRoomID(roomID)) {
+            logger.warn(`User attempted to use invalid roomID (${roomID})`)
+            io.emit('roomRequestResult', {
+                "result": "failure",
+                "message": "Invalid room id"
+            });
+            return;
+        }
+
+        function isValidNickname(nickname) {
+            if (nickname.length < 1 || nickname.length > 15) return false;
+            if (!nickname.match(/^[0-9a-zA-Z]+$/)) return false;
+            return true;
+        }
+
+        if (!isValidNickname(nickname)) {
+            logger.warn(`User attempted to use invalid nickname (${nickname})`)
+            io.emit('roomRequestResult', {
+                "result": "failure",
+                "message": "Invalid nickname"
+            });
+            return;
+        }
+
         if (socket.id in idToPlayer) {
             io.emit('roomRequestResult', {
                 "result": "failure",
-                "message": "already in a room"
+                "message": "Already in a room"
             })
+            logger.warn(`User (${socket.id}) attempted to join another room (${roomID})`
+                + ` while already being in a room (${idToPlayer[socket.id]["room"]["id"]})`);
             return;
         }
 
         if (!(roomID in rooms)) {
-            logger.info(`A new room ${roomID} has been created`)
+            logger.info(`New room ${roomID} has been created`)
             rooms[roomID] = new Room(roomID);
         }
 
         const player = new Player(socket.id, nickname, rooms[roomID]);
-        logger.info(`A new player ${player["id"]} has been created`)
+        logger.info(`New player ${player["id"]} has been created`)
 
         rooms[roomID].addPlayer(player);
         idToPlayer[socket.id] = player;
@@ -78,7 +119,7 @@ io.on('connection', function (socket) {
             "result": "success",
             "message": "player joined a room"
         })
-        logger.info(`A player (${player["id"]}) has successfully joined room ${roomID}`);
+        logger.info(`Player (${player["id"]}) has successfully joined room ${roomID}`);
     });
 });
 
