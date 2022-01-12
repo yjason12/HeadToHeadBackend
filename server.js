@@ -1,7 +1,6 @@
 const Room = require('./room')
 const Player = require('./player')
-const logger = require('./logger.js')
-
+const logger = require('./logger')
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require("socket.io")(http, {
@@ -10,17 +9,16 @@ const io = require("socket.io")(http, {
         methods: ["GET", "POST"]
     }
 });
+
 const cors = require('cors');
+app.use(cors())
 
 var rooms = {};
 var idToPlayer = {};
 
-app.use(cors())
 app.get('/', function (req, res) {
     res.send("pong");
 });
-
-
 
 io.on('connection', function (socket) {
     logger.info(`User (${socket.id}) has connected`);
@@ -29,13 +27,13 @@ io.on('connection', function (socket) {
         logger.info(`User (${socket.id}) has disconnected`);
 
         if (!(socket.id in idToPlayer)) {
-            logger.error(`Unrecognized player (${socket.id}) has disconnected (somehow)`);
+            logger.warn(`Unrecognized player (${socket.id}) has disconnected (somehow)`);
             return;
         }
 
         const disconnectedPlayer = idToPlayer[socket.id];
         if (disconnectedPlayer["room"] == null) {
-            logger.error(`Player (${socket.id}) without a room has disconnected (somehow)`);
+            logger.warn(`Player (${socket.id}) without a room has disconnected (somehow)`);
             return;
         }
         const disconnectedRoom = disconnectedPlayer["room"];
@@ -50,8 +48,6 @@ io.on('connection', function (socket) {
     });
 
     socket.on('roomRequest', (roomInfo) => {
-
-
         if (!("roomID" in roomInfo)) {
             logger.warn("Invalid JSON was sent to roomRequest: Missing roomID")
             return;
@@ -131,4 +127,3 @@ http.listen(3001, function () {
 const roomRouter = require("./routes/room");
 
 app.use("/room", roomRouter);
-
