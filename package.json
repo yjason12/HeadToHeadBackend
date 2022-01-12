@@ -1,8 +1,10 @@
 {
   "dependencies": {
+    "config": "^3.3.7",
     "express": "^4.17.2",
     "socket.io": "^4.4.0",
-    "unirest": "^0.6.0"
+    "unirest": "^0.6.0",
+    "winston": "^3.4.0"
   },
   "name": "headtohead_backend",
   "version": "1.0.0",

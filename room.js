@@ -1,6 +1,6 @@
 class Room {
-    constructor(roomID){
-        this.roomID = roomID;
+    constructor(id){
+        this.id = id;
         this.players = [];
     }
 
@@ -9,11 +9,16 @@ class Room {
     }
     
     removePlayer(player){
-        this.players.splice(this.players.map(x => x.playerID).indexOf(player.playerID), 1);
+        this.players.splice(this.players.map(x => x.id).indexOf(player.id), 1);
     }
     
     getRoomSize(){
         return this.players.length;
     }
-
 }
+
+Room.prototype.toString = function roomToString() {
+    return `${this.id}: ${this.players}`
+}
+
+module.exports = Room
