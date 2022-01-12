@@ -1,7 +1,7 @@
 class Player{
 
-    constructor(playerID, nickname, room){
-        this.playerID = playerID;
+    constructor(id, nickname, room){
+        this.id = id;
         this.nickname = nickname;
         this.room = room;
     }
@@ -11,12 +11,12 @@ class Player{
     }
 
     disconnect(){
-        this.room.removePlayer(this.playerID);
+        this.room.removePlayer(this);
     }
-
-    
-
-
-    
-
 }
+
+Player.prototype.toString = function playerToString() {
+    return `${this.nickname} (${this.id})`;
+}
+
+module.exports = Player
