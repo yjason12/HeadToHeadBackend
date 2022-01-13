@@ -17,17 +17,20 @@ describe("simple socket tests", () => {
             });
             clientSocket1.on("connect", () => {
                 clientSocket2.on("connect", () => {
-                    clientSocket3.on("connect", done);
+                    clientSocket3.on("connect", () => {
+                        done();
+                    })
                 });
             });
         });
     });
 
-    afterEach(() => {
+    afterEach((done) => {
         io.close();
         clientSocket1.close();
         clientSocket2.close();
         clientSocket3.close();
+        done();
     });
 
     function checkSuccessRoomRequestResult(done) {
@@ -73,10 +76,13 @@ describe("simple socket tests", () => {
 
     test("double join room", (done) => {
         clientSocket1.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
-            clientSocket2.on("roomRequestResult", checkSuccessRoomRequestResult(done));
-            makeRoomRequest(clientSocket2, "testroom", "testnickname");
-        }));
+        makeRoomRequest(clientSocket2, "testroom", "testnickname");
+
+         }));
         makeRoomRequest(clientSocket1, "testroom", "testnickname")
+        clientSocket2.on("roomRequestResult", checkSuccessRoomRequestResult(done));
+        
+
     });
 
     test("triple join room", (done) => {
@@ -106,6 +112,15 @@ describe("simple socket tests", () => {
         makeRoomRequest(clientSocket1, "testroom", "testnickname");
     });
 
+    test("disconnect doesn't break joining", (done) => {
+        clientSocket1.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
+        clientSocket2.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
+            done();}));
+                clientSocket1.close();
+                makeRoomRequest(clientSocket2, "testroom", "testnickname");
+        }));
+        makeRoomRequest(clientSocket1, "testroom", "testnickname");
+    });
 
     test("reject invalid roomid -- empty", (done) => {
         clientSocket1.on("roomRequestResult", checkFailureRoomRequestResult(done, "Invalid room id"));
