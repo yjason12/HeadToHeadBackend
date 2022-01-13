@@ -6,7 +6,6 @@ describe("socket tests", () => {
     let io, serverSocket, clientSocket1, clientSocket2, clientSocket3;
 
     beforeEach((done) => {
-        console.log("resetting")
         const httpServer = createServer();
         io = new Server(httpServer);
         httpServer.listen(() => {
@@ -24,161 +23,118 @@ describe("socket tests", () => {
         });
     });
 
-    afterAll(() => {
+    afterEach(() => {
         io.close();
         clientSocket1.close();
         clientSocket2.close();
         clientSocket3.close();
     });
 
-    test("single join room", (done) => {
-        clientSocket1.on("roomRequestResult", (arg) => {
-            expect(JSON.stringify(arg)).toBe(JSON.stringify({
-                "result": "success",
-                "message": "player joined a room"
-            }));
-            done();
-        });
+    function checkSuccessRoomRequestResult(done) {
+        return (arg) => {
+            try {
+                expect(JSON.stringify(arg)).toBe(JSON.stringify({
+                    "result": "success",
+                    "message": "player joined a room"
+                }));
+                done();
+            }
+            catch (error) {
+                done(error);
+            }
+        }
+    }
 
-        clientSocket1.emit("roomRequest", {
-            "roomID": "testroom",
-            "nickname": "testnickname"
+    function checkFailureRoomRequestResult(done, failureMessage) {
+        return (arg) => {
+            try {
+                expect(JSON.stringify(arg)).toBe(JSON.stringify({
+                    "result": "failure",
+                    "message": failureMessage
+                }));
+                done();
+            } catch (error) {
+                done(error);
+            }
+        }
+    }
+
+    function makeRoomRequest(socket, roomID, nickname) {
+        socket.emit("roomRequest", {
+            "roomID": roomID,
+            "nickname": nickname
         });
+    }
+
+    test("single join room", (done) => {
+        clientSocket1.on("roomRequestResult", checkSuccessRoomRequestResult(done));
+        makeRoomRequest(clientSocket1, "testroom", "testnickname")
     });
 
     test("double join room", (done) => {
-        clientSocket1.on("roomRequestResult", (arg) => {
-            try {
-                expect(JSON.stringify(arg)).toBe(JSON.stringify({
-                    "result": "success",
-                    "message": "player joined a room"
-                }));
-            }
-            catch (error) {
-                done(error)
-            }
-        });
-
-        clientSocket1.emit("roomRequest", {
-            "roomID": "testroom",
-            "nickname": "testnickname"
-        });
-
-        clientSocket2.on("roomRequestResult", (arg) => {
-            try {
-                expect(JSON.stringify(arg)).toBe(JSON.stringify({
-                    "result": "success",
-                    "message": "player joined a room"
-                }));
-                done();
-            }
-            catch (error) {
-                done(error)
-            }
-        });
-
-        clientSocket2.emit("roomRequest", {
-            "roomID": "testroom",
-            "nickname": "testnickname"
-        });
+        clientSocket1.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
+            clientSocket2.on("roomRequestResult", checkSuccessRoomRequestResult(done));
+            makeRoomRequest(clientSocket2, "testroom", "testnickname");
+        }));
+        makeRoomRequest(clientSocket1, "testroom", "testnickname")
     });
 
     test("triple join room", (done) => {
-        clientSocket1.on("roomRequestResult", (arg) => {
-            try {
-                expect(JSON.stringify(arg)).toBe(JSON.stringify({
-                    "result": "success",
-                    "message": "player joined a room"
-                }));
-                done();
-            }
-            catch (error) {
-                done(error)
-            }
-        });
+        clientSocket1.on("roomRequestResult", checkSuccessRoomRequestResult(() => { }));
+        makeRoomRequest(clientSocket1, "testroom", "testnickname")
 
-        clientSocket1.emit("roomRequest", {
-            "roomID": "testroom",
-            "nickname": "testnickname"
-        });
+        clientSocket2.on("roomRequestResult", checkSuccessRoomRequestResult(() => { }));
+        makeRoomRequest(clientSocket2, "testroom", "testnickname");
 
-        clientSocket2.on("roomRequestResult", (arg) => {
-            try {
-                expect(JSON.stringify(arg)).toBe(JSON.stringify({
-                    "result": "success",
-                    "message": "player joined a room"
-                }));
-                done();
-            }
-            catch (error) {
-                done(error)
-            }
-        });
-
-        clientSocket2.emit("roomRequest", {
-            "roomID": "testroom",
-            "nickname": "testnickname"
-        });
-
-        clientSocket3.on("roomRequestResult", (arg) => {
-            try {
-                expect(JSON.stringify(arg)).toBe(JSON.stringify({
-                    "result": "success",
-                    "message": "player joined a room"
-                }));
-                done();
-            }
-            catch (error) {
-                done(error)
-            }
-        });
-
-        clientSocket3.emit("roomRequest", {
-            "roomID": "testroom",
-            "nickname": "testnickname"
-        });
+        clientSocket3.on("roomRequestResult", checkSuccessRoomRequestResult(done));
+        makeRoomRequest(clientSocket3, "testroom", "testnickname");
     });
 
-    test("failed rejoin room", (done) => {
-        let counter = 0;
-        clientSocket1.on("roomRequestResult", (arg) => {
-            console.log(`counter: ${counter}`)
-            console.log(arg)
-            if (counter == 0) {
-                try {
-                counter += 1
-                expect(JSON.stringify(arg)).toBe(JSON.stringify({
-                    "result": "success",
-                    "message": "player joined a room"
-                }));
-                }
-                catch(error) {
-                    done(error);
-                }
-            }
-            else if (counter == 1) {
-                try {
-                    expect(JSON.stringify(arg)).toBe(JSON.stringify({
-                        "result": "failure",
-                        "message": "Already in a room"
-                    }));
-                    done();
-                }
-                catch (error) {
-                    done(error)
-                }
-            }
-        });
-
-        clientSocket1.emit("roomRequest", {
-            "roomID": "testroom",
-            "nickname": "testnickname"
-        });
-
-        clientSocket1.emit("roomRequest", {
-            "roomID": "testroom",
-            "nickname": "testnickname"
-        });
-
+    test("failed rejoin same room", (done) => {
+        clientSocket1.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
+            clientSocket1.on("roomRequestResult", checkFailureRoomRequestResult(done, "Already in a room"));
+            makeRoomRequest(clientSocket1, "testroom", "testnickname");
+        }));
+        makeRoomRequest(clientSocket1, "testroom", "testnickname");
     });
+
+    test("failed rejoin different room", (done) => {
+        clientSocket1.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
+            clientSocket1.on("roomRequestResult", checkFailureRoomRequestResult(done, "Already in a room"));
+            makeRoomRequest(clientSocket1, "testroom2", "testnickname");
+        }));
+        makeRoomRequest(clientSocket1, "testroom", "testnickname");
+    });
+
+
+    test("reject invalid roomid -- empty", (done) => {
+        clientSocket1.on("roomRequestResult", checkFailureRoomRequestResult(done, "Invalid room id"));
+        makeRoomRequest(clientSocket1, "", "testnickname");
+    });
+
+    test("reject invalid roomid -- too long", (done) => {
+        clientSocket1.on("roomRequestResult", checkFailureRoomRequestResult(done, "Invalid room id"));
+        makeRoomRequest(clientSocket1, "aaaaaaaaaaaaaaaaaaaaaaa", "testnickname");
+    });
+
+    test("reject invalid roomid -- non-alphanumeric characters", (done) => {
+        clientSocket1.on("roomRequestResult", checkFailureRoomRequestResult(done, "Invalid room id"));
+        makeRoomRequest(clientSocket1, "!*@#&", "testnickname");
+    });
+
+    test("reject invalid nickname -- empty", (done) => {
+        clientSocket1.on("roomRequestResult", checkFailureRoomRequestResult(done, "Invalid nickname"));
+        makeRoomRequest(clientSocket1, "testroom", "");
+    });
+
+    test("reject invalid nickname -- too long", (done) => {
+        clientSocket1.on("roomRequestResult", checkFailureRoomRequestResult(done, "Invalid nickname"));
+        makeRoomRequest(clientSocket1, "testroom", "aaaaaaaaaaaaaaaaaaa");
+    });
+
+    test("reject invalid nickname -- non-alphanumeric characters", (done) => {
+        clientSocket1.on("roomRequestResult", checkFailureRoomRequestResult(done, "Invalid nickname"));
+        makeRoomRequest(clientSocket1, "testroom", "asd@");
+    });
+
 });
