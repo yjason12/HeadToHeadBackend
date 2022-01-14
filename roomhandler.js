@@ -12,8 +12,8 @@ class RoomHandler {
         return this.idToPlayer[playerID];
     }
 
-    getNicknameList(){
-        return Object.keys(this.idToPlayer).map(id => this.getPlayer(id).nickname)
+    getNicknameList(roomID){
+        return this.rooms[roomID].players.map(p => p.nickname);
     }
     checkPlayerExists(playerID) {
         return playerID in this.idToPlayer;

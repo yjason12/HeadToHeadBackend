@@ -78,7 +78,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('getNicknameList', (roomInfo) => {
-        Util.sendNicknameList(io.to(socket.id), roomHandler.getNicknameList());
+        Util.sendNicknameList(io.to(socket.id), roomHandler.getNicknameList(roomInfo['roomID']));
     });
 
     socket.on('updatePlayerNickname', (roomInfo) => {
