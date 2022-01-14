@@ -86,8 +86,11 @@ io.on('connection', function (socket) {
         logger.info(`Sent player list of room ${roomID}`)
     });
 
-    socket.on('updatePlayerNickname', (roomInfo) => {
-
+    socket.on('updatePlayerNickname', (msg) => {
+        let newName = msg['newName'];
+        if(Util.isValidNickname(newName)){
+            roomHandler.getPlayer(socket.id).changeNickname(newName);
+        }
     });
 });
 
