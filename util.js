@@ -44,6 +44,11 @@ class Util {
         })
     }
 
+    static sendNicknameList(io, list) {
+        io.emit('updateNickname', {
+            'nicknames': list
+        })
+    }
 }
 
 module.exports = Util

@@ -689,6 +689,11 @@
   dependencies:
     "type-fest" "^0.21.3"
 
+"ansi-font@0.0.2":
+  "integrity" "sha1-iQMBvVhBRi/TnAt3Ca/R9SUUMzE="
+  "resolved" "https://registry.npmjs.org/ansi-font/-/ansi-font-0.0.2.tgz"
+  "version" "0.0.2"
+
 "ansi-regex@^5.0.1":
   "integrity" "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ=="
   "resolved" "https://registry.npmjs.org/ansi-regex/-/ansi-regex-5.0.1.tgz"
@@ -1008,7 +1013,6 @@
   dependencies:
     "anymatch" "~3.1.2"
     "braces" "~3.0.2"
-    "fsevents" "~2.3.2"
     "glob-parent" "~5.1.2"
     "is-binary-path" "~2.1.0"
     "is-glob" "~4.0.1"
@@ -1500,7 +1504,6 @@
     "estraverse" "^5.2.0"
     "esutils" "^2.0.2"
     "optionator" "^0.8.1"
-    "source-map" "~0.6.1"
   optionalDependencies:
     "source-map" "~0.6.1"
 
@@ -2269,7 +2272,6 @@
     "@types/node" "*"
     "anymatch" "^3.0.3"
     "fb-watchman" "^2.0.0"
-    "fsevents" "^2.3.2"
     "graceful-fs" "^4.2.4"
     "jest-regex-util" "^27.4.0"
     "jest-serializer" "^27.4.0"
@@ -3591,6 +3593,13 @@
     "@istanbuljs/schema" "^0.1.2"
     "glob" "^7.1.4"
     "minimatch" "^3.0.4"
+
+"test@^0.6.0":
+  "integrity" "sha1-WYasRF7Bd1QyJRLRBLoyyKY+k44="
+  "resolved" "https://registry.npmjs.org/test/-/test-0.6.0.tgz"
+  "version" "0.6.0"
+  dependencies:
+    "ansi-font" "0.0.2"
 
 "text-hex@1.0.x":
   "integrity" "sha512-uuVGNWzgJ4yhRaNSiubPY7OjISw4sw4E5Uv0wbjp+OzcbmVU/rsT8ujgcXJhn9ypzsgr5vlzpPqP+MBBKcGvbg=="

@@ -8,12 +8,19 @@ class RoomHandler {
         this.idToPlayer = {};
     }
 
+    getPlayer(playerID) {
+        return this.idToPlayer[playerID];
+    }
+
+    getNicknameList(roomID){
+        return this.rooms[roomID].players.map(p => p.nickname);
+    }
     checkPlayerExists(playerID) {
         return playerID in this.idToPlayer;
     }
 
     checkPlayerHasRoom(playerID) {
-        return this.idToPlayer[playerID]["room"] != null;
+        return this.getPlayer(playerID)["room"] != null;
     }
 
     getRoomIDOfPlayer(playerID) {
@@ -23,11 +30,11 @@ class RoomHandler {
         if(!this.checkPlayerHasRoom(playerID))
             throw new Error("Player did not have associated room")
 
-        return this.idToPlayer[playerID]["room"]["id"]
+        return this.getPlayer(playerID)["room"]["id"]
     }
 
     disconnectPlayer(playerID) {
-        this.idToPlayer[playerID].disconnect();//fix later, we dont need to call player.disconnect
+        this.getPlayer(playerID).disconnect();//fix later, we dont need to call player.disconnect
         //should this call deleteRoomIfEmpty?
     }
 

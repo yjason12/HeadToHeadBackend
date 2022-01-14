@@ -76,6 +76,14 @@ io.on('connection', function (socket) {
         Util.sendSuccessRoomResult(io.to(socket.id));
         logger.info(`Player (${socket.id}) has successfully joined room ${roomID}`);
     });
+
+    socket.on('getNicknameList', (roomInfo) => {
+        Util.sendNicknameList(io.to(socket.id), roomHandler.getNicknameList(roomInfo['roomID']));
+    });
+
+    socket.on('updatePlayerNickname', (roomInfo) => {
+
+    });
 });
 
 http.listen(3001, function () {
