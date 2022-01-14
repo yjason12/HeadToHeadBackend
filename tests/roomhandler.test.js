@@ -39,7 +39,7 @@ describe("room event tests", () => {
         roomHandler.createRoomIfNotExist("testroom");
         roomHandler.createPlayer("playerID1", "nickname", "testroom");
         roomHandler.createPlayer("playerID2", "nickname2", "testroom");
-        expect((roomHandler.rooms).length).toBe(1); //roomHandler.rooms.length not working
+        expect(Object.keys(roomHandler.rooms).length).toBe(1); //roomHandler.rooms.length not working
     });
 
     test("delete room if empty", () =>{
