@@ -21,7 +21,7 @@ class RoomHandler {
     }
 
     checkPlayerHasRoom(playerID) {
-        return this.getPlayer(playerID)["room"] != null;
+        return this.getPlayer(playerID).room != null;
     }
 
     getRoomIDOfPlayer(playerID) {
@@ -31,7 +31,7 @@ class RoomHandler {
         if(!this.checkPlayerHasRoom(playerID))
             throw new Error("Player did not have associated room")
 
-        return this.getPlayer(playerID)["room"]["id"]
+        return this.getPlayer(playerID).room.id
     }
     
     getRoomOfPlayer(playerID) {
@@ -41,7 +41,7 @@ class RoomHandler {
         if(!this.checkPlayerHasRoom(playerID))
             throw new Error("Player did not have associated room")
 
-        return this.getPlayer(playerID)["room"]
+        return this.getPlayer(playerID).room
     }
 
     disconnectPlayer(playerID) {
@@ -50,7 +50,7 @@ class RoomHandler {
     }
 
     deleteRoomIfEmpty(roomID) {
-        if (this.rooms[roomID]["players"].length == 0) {//do we want safety checks for if room doesnt exist
+        if (this.rooms[roomID].players.length == 0) {//do we want safety checks for if room doesnt exist
             delete this.rooms[roomID]
             return true;
         }
