@@ -38,11 +38,12 @@ io.on('connection', function (socket) {
         }
 
         logger.info(`User (${socket.id}) has disconnected`);
-        roomHandler.disconnectPlayer(socket.id);
 
         const formerRoomID = roomHandler.getRoomIDOfPlayer(socket.id);
         socket.leave(formerRoomID);
-        roomHandler.removePlayer(socket.id);
+
+        roomHandler.disconnectPlayer(socket.id);
+
         if(roomHandler.deleteRoomIfEmpty(formerRoomID)) {
             logger.info(`${formerRoomID} has been deleted due to lack of players.`);
         } else {

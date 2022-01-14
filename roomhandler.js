@@ -21,7 +21,7 @@ class RoomHandler {
     }
 
     checkPlayerHasRoom(playerID) {
-        return this.getPlayer(playerID)["room"] != null;
+        return this.getPlayer(playerID).room != null;
     }
 
     getRoomIDOfPlayer(playerID) {
@@ -31,8 +31,9 @@ class RoomHandler {
         if(!this.checkPlayerHasRoom(playerID))
             throw new Error("Player did not have associated room")
 
-        return this.getPlayer(playerID)["room"]["id"]
+        return this.getPlayer(playerID).room.id
     }
+    
     getRoomOfPlayer(playerID) {
         if(!this.checkPlayerExists(playerID))
             throw new Error("Player was not found in ID list")
@@ -40,16 +41,23 @@ class RoomHandler {
         if(!this.checkPlayerHasRoom(playerID))
             throw new Error("Player did not have associated room")
 
-        return this.getPlayer(playerID)["room"]
+        return this.getPlayer(playerID).room
     }
 
     disconnectPlayer(playerID) {
-        this.getPlayer(playerID).disconnect();//fix later, we dont need to call player.disconnect
-        //should this call deleteRoomIfEmpty?
+        if(!this.checkPlayerExists(playerID))
+            throw new Error("Player was not found in ID list")
+
+        this.getPlayer(playerID).disconnect();
+        delete this.idToPlayer[playerID]
     }
 
     deleteRoomIfEmpty(roomID) {
-        if (this.rooms[roomID]["players"].length == 0) {//do we want safety checks for if room doesnt exist
+        if(!(roomID in this.rooms)){
+            throw new Error("RoomID was not found in rooms list");
+        }
+        
+        if (this.rooms[roomID].players.length == 0) {//do we want safety checks for if room doesnt exist
             delete this.rooms[roomID]
             return true;
         }
@@ -69,10 +77,6 @@ class RoomHandler {
         const player = new Player(id, nickname, this.rooms[roomID]);
         this.idToPlayer[id] = player;
         this.addPlayerToRoom(id, roomID)
-    }
-
-    removePlayer(id) {//can just put this in disconnectPlayer()
-        delete this.idToPlayer[id]
     }
 
     addPlayerToRoom(playerID, roomID) {//probably not needed since player already assigned to room from the start

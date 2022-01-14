@@ -14,8 +14,7 @@ class Room {
     
     removePlayer(player){
         if(!this.playerExists(player)){
-            console.log("tried to remove a player that does not exist in room");
-            return;
+            throw new Error("Tried to remove a player that does not exist in room");
         }
         
         this.players.splice(this.players.map(x => x.id).indexOf(player.id), 1);
