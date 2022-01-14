@@ -14,7 +14,7 @@ describe("room event tests", () => {
     test("remove player", () => {
         roomHandler.createPlayer("123456", "testnickname", "testroom");
         expect(roomHandler.checkPlayerExists("123456")).toBe(true);
-        roomHandler.removePlayer("123456")
+        roomHandler.disconnectPlayer("123456")
         expect(roomHandler.checkPlayerExists("123456")).toBe(false);
     });
 
