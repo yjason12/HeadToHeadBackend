@@ -13,17 +13,18 @@ class Room {
     }
     
     removePlayer(player){
-        if(this.playerExists(player)){
-            this.players.splice(this.players.map(x => x.playerID).indexOf(player.playerID), 1);
-            if(player === this.leader){
-                if(this.getRoomSize() >= 1){
-                    this.leader = this.players[0];
-                } else{
-                    this.leader = null;
-                }
-            }
-        } else {
+        if(!this.playerExists(player)){
             console.log("tried to remove a player that does not exist in room");
+            return;
+        }
+        
+        this.players.splice(this.players.map(x => x.playerID).indexOf(player.playerID), 1);
+        if(player === this.leader){
+            if(this.getRoomSize() >= 1){
+                this.leader = this.players[0];
+            } else{
+                this.leader = null;
+            }
         }
     }
     
