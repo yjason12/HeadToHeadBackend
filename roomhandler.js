@@ -45,11 +45,18 @@ class RoomHandler {
     }
 
     disconnectPlayer(playerID) {
+        if(!this.checkPlayerExists(playerID))
+            throw new Error("Player was not found in ID list")
+
         this.getPlayer(playerID).disconnect();
         delete this.idToPlayer[playerID]
     }
 
     deleteRoomIfEmpty(roomID) {
+        if(!(roomID in this.rooms)){
+            throw new Error("RoomID was not found in rooms list");
+        }
+        
         if (this.rooms[roomID].players.length == 0) {//do we want safety checks for if room doesnt exist
             delete this.rooms[roomID]
             return true;
