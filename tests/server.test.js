@@ -3,7 +3,7 @@ const { Server } = require("socket.io");
 const Client = require("socket.io-client");
 
 describe("simple socket tests", () => {
-    let io, serverSocket, clientSocket1, clientSocket2, clientSocket3;
+    let io, clientSocket1, clientSocket2, clientSocket3;
 
     beforeEach((done) => {
         const httpServer = createServer();
@@ -12,9 +12,6 @@ describe("simple socket tests", () => {
             clientSocket1 = new Client(`http://localhost:3001`);
             clientSocket2 = new Client(`http://localhost:3001`);
             clientSocket3 = new Client(`http://localhost:3001`);
-            io.on("connection", (socket) => {
-                serverSocket = socket;
-            });
             clientSocket1.on("connect", () => {
                 clientSocket2.on("connect", () => {
                     clientSocket3.on("connect", () => {
@@ -112,7 +109,7 @@ describe("simple socket tests", () => {
         makeRoomRequest(clientSocket1, "testroom", "testnickname");
     });
 
-    test("disconnect doesn't break joining", (done) => {
+    test("disconnect doesn't break joining same room", (done) => {
         clientSocket1.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
         clientSocket2.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
             done();}));
@@ -121,6 +118,17 @@ describe("simple socket tests", () => {
         }));
         makeRoomRequest(clientSocket1, "testroom", "testnickname");
     });
+
+    test("disconnect doesn't break joining different room", (done) => {
+        clientSocket1.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
+        clientSocket2.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
+            done();}));
+                clientSocket1.close();
+                makeRoomRequest(clientSocket2, "testroomaksdfj", "testnicknameaskdfj");
+        }));
+        makeRoomRequest(clientSocket1, "testroom", "testnickname");
+    });
+
 
     test("reject invalid roomid -- empty", (done) => {
         clientSocket1.on("roomRequestResult", checkFailureRoomRequestResult(done, "Invalid room id"));

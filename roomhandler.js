@@ -17,8 +17,11 @@ class RoomHandler {
     }
 
     getRoomIDOfPlayer(playerID) {
-        if(!this.checkPlayerExists(playerID) || !this.checkPlayerHasRoom(playerID))
-            return
+        if(!this.checkPlayerExists(playerID))
+            throw new Error("Player was not found in ID list")
+        
+        if(!this.checkPlayerHasRoom(playerID))
+            throw new Error("Player did not have associated room")
 
         return this.idToPlayer[playerID]["room"]["id"]
     }
@@ -46,15 +49,15 @@ class RoomHandler {
     createPlayer(id, nickname, roomID) {
         const player = new Player(id, nickname, this.rooms[roomID]);
         this.idToPlayer[id] = player;
-        this.addPlayerToRoom(player, roomID)
+        this.addPlayerToRoom(id, roomID)
     }
 
     removePlayer(id) {
         delete this.idToPlayer[id]
     }
 
-    addPlayerToRoom(player, roomID) {
-        this.rooms[roomID].addPlayer(player);
+    addPlayerToRoom(playerID, roomID) {
+        this.rooms[roomID].addPlayer(this.idToPlayer[playerID]);
     }
 }
 
