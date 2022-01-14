@@ -44,8 +44,8 @@ class RoomHandler {
     }
 
     disconnectPlayer(playerID) {
-        this.getPlayer(playerID).disconnect();//fix later, we dont need to call player.disconnect
-        //should this call deleteRoomIfEmpty?
+        this.getPlayer(playerID).disconnect();
+        delete this.idToPlayer[playerID]
     }
 
     deleteRoomIfEmpty(roomID) {
@@ -69,10 +69,6 @@ class RoomHandler {
         const player = new Player(id, nickname, this.rooms[roomID]);
         this.idToPlayer[id] = player;
         this.addPlayerToRoom(id, roomID)
-    }
-
-    removePlayer(id) {//can just put this in disconnectPlayer()
-        delete this.idToPlayer[id]
     }
 
     addPlayerToRoom(playerID, roomID) {//probably not needed since player already assigned to room from the start
