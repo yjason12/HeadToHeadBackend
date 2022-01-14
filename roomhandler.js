@@ -15,6 +15,7 @@ class RoomHandler {
     getNicknameList(roomID){
         return this.rooms[roomID].players.map(p => p.nickname);
     }
+
     checkPlayerExists(playerID) {
         return playerID in this.idToPlayer;
     }
@@ -61,11 +62,11 @@ class RoomHandler {
         this.addPlayerToRoom(id, roomID)
     }
 
-    removePlayer(id) {
+    removePlayer(id) {//can just put this in disconnectPlayer()
         delete this.idToPlayer[id]
     }
 
-    addPlayerToRoom(playerID, roomID) {
+    addPlayerToRoom(playerID, roomID) {//probably not needed since player already assigned to room from the start
         this.rooms[roomID].addPlayer(this.idToPlayer[playerID]);
     }
 }
