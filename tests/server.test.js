@@ -78,7 +78,7 @@ describe("simple socket tests", () => {
          }));
         makeRoomRequest(clientSocket1, "testroom", "testnickname")
         clientSocket2.on("roomRequestResult", checkSuccessRoomRequestResult(done));
-        
+
 
     });
 
@@ -95,14 +95,17 @@ describe("simple socket tests", () => {
 
     test("failed rejoin same room", (done) => {
         clientSocket1.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
+            clientSocket1.removeAllListeners();
             clientSocket1.on("roomRequestResult", checkFailureRoomRequestResult(done, "Already in a room"));
             makeRoomRequest(clientSocket1, "testroom", "testnickname");
         }));
         makeRoomRequest(clientSocket1, "testroom", "testnickname");
+
     });
 
     test("failed rejoin different room", (done) => {
         clientSocket1.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
+            clientSocket1.removeAllListeners();
             clientSocket1.on("roomRequestResult", checkFailureRoomRequestResult(done, "Already in a room"));
             makeRoomRequest(clientSocket1, "testroom2", "testnickname");
         }));
@@ -111,20 +114,18 @@ describe("simple socket tests", () => {
 
     test("disconnect doesn't break joining same room", (done) => {
         clientSocket1.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
-        clientSocket2.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
-            done();}));
-                clientSocket1.close();
-                makeRoomRequest(clientSocket2, "testroom", "testnickname");
+            clientSocket2.on("roomRequestResult", checkSuccessRoomRequestResult(done));
+            clientSocket1.close();
+            makeRoomRequest(clientSocket2, "testroom", "testnickname");
         }));
         makeRoomRequest(clientSocket1, "testroom", "testnickname");
     });
 
     test("disconnect doesn't break joining different room", (done) => {
         clientSocket1.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
-        clientSocket2.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
-            done();}));
-                clientSocket1.close();
-                makeRoomRequest(clientSocket2, "testroomaksdfj", "testnicknameaskdfj");
+            clientSocket2.on("roomRequestResult", checkSuccessRoomRequestResult(done));
+            clientSocket1.close();
+            makeRoomRequest(clientSocket2, "testroomaksdfj", "testnameaskdfj");
         }));
         makeRoomRequest(clientSocket1, "testroom", "testnickname");
     });
