@@ -29,7 +29,8 @@ describe("room event tests", () => {
         bob = new Player("id1", "bob", "roomA");
         room.addPlayer(bob);
         room.addPlayer(new Player("id2", "bill", "roomA"));
-        room.addPlayer(new Player("id2", "bill", "roomA"));
+        room.addPlayer(new Player("id3", "bill", "roomA"));
+        room.addPlayer(new Player("id4", "bill", "roomA"));
         expect(room.leader.id).toBe("id1");
     })
 
