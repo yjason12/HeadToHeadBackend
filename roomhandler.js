@@ -33,6 +33,15 @@ class RoomHandler {
 
         return this.getPlayer(playerID)["room"]["id"]
     }
+    getRoomOfPlayer(playerID) {
+        if(!this.checkPlayerExists(playerID))
+            throw new Error("Player was not found in ID list")
+        
+        if(!this.checkPlayerHasRoom(playerID))
+            throw new Error("Player did not have associated room")
+
+        return this.getPlayer(playerID)["room"]
+    }
 
     disconnectPlayer(playerID) {
         this.getPlayer(playerID).disconnect();//fix later, we dont need to call player.disconnect

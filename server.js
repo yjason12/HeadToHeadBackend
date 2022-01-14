@@ -41,11 +41,13 @@ io.on('connection', function (socket) {
         roomHandler.disconnectPlayer(socket.id);
 
         const formerRoomID = roomHandler.getRoomIDOfPlayer(socket.id);
+        socket.leave(formerRoomID);
+        roomHandler.removePlayer(socket.id);
         if(roomHandler.deleteRoomIfEmpty(formerRoomID)) {
             logger.info(`${formerRoomID} has been deleted due to lack of players.`);
+        } else {
+            Util.sendNicknameList(io.to(formerRoomID), roomHandler.getNicknameList(formerRoomID));
         }
-
-        roomHandler.removePlayer(socket.id)
         logger.info(`Player (${socket.id}) has been erased`)
     });
 
@@ -74,11 +76,14 @@ io.on('connection', function (socket) {
         roomHandler.createPlayer(socket.id, nickname, roomID);
 
         Util.sendSuccessRoomResult(io.to(socket.id));
+        socket.join(roomID);
         logger.info(`Player (${socket.id}) has successfully joined room ${roomID}`);
     });
 
-    socket.on('getNicknameList', (roomInfo) => {
-        Util.sendNicknameList(io.to(socket.id), roomHandler.getNicknameList(roomInfo['roomID']));
+    socket.on('getNicknameList', () => {
+        let roomID = roomHandler.getRoomIDOfPlayer(socket.id);
+        Util.sendNicknameList(io.to(roomID), roomHandler.getNicknameList(roomID));
+        logger.info(`Sent player list of room ${roomID}`)
     });
 
     socket.on('updatePlayerNickname', (roomInfo) => {
