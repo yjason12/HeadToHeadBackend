@@ -10,6 +10,7 @@ class Player{
         this.nickname = newNickname;
     }
 
+    //player does not need disconnect, roomhandler should disconnect the player
     disconnect(){
         this.room.removePlayer(this);
     }

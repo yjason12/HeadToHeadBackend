@@ -27,11 +27,12 @@ class RoomHandler {
     }
 
     disconnectPlayer(playerID) {
-        this.idToPlayer[playerID].disconnect();
+        this.idToPlayer[playerID].disconnect();//fix later, we dont need to call player.disconnect
+        //should this call deleteRoomIfEmpty?
     }
 
     deleteRoomIfEmpty(roomID) {
-        if (this.rooms[roomID]["players"].length == 0) {
+        if (this.rooms[roomID]["players"].length == 0) {//do we want safety checks for if room doesnt exist
             delete this.rooms[roomID]
             return true;
         }
