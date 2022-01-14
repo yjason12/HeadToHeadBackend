@@ -47,6 +47,7 @@ class RoomHandler {
     }
 
     createPlayer(id, nickname, roomID) {
+        this.createRoomIfNotExist(roomID)
         const player = new Player(id, nickname, this.rooms[roomID]);
         this.idToPlayer[id] = player;
         this.addPlayerToRoom(id, roomID)

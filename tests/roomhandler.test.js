@@ -1,4 +1,3 @@
-const { parseExpectedArgs } = require("commander");
 const RoomHandler = require("../roomhandler");
 
 describe("room event tests", () => {
@@ -25,11 +24,4 @@ describe("room event tests", () => {
         roomHandler.addPlayerToRoom("123456", "testroom")
         expect(roomHandler.getRoomIDOfPlayer("123456")).toBe("testroom")
     });
-
-    test("fail to get room ID", () => {
-        roomHandler.createPlayer("123456", "testnickname", "testroom");
-        expect(() => {roomHandler.getRoomIDOfPlayer("123456")}).toThrow("Player did not have associated room")
-    });
-
-
 });
