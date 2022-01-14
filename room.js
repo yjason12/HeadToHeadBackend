@@ -18,7 +18,7 @@ class Room {
             return;
         }
         
-        this.players.splice(this.players.map(x => x.playerID).indexOf(player.playerID), 1);
+        this.players.splice(this.players.map(x => x.id).indexOf(player.id), 1);
         if(player === this.leader){
             if(this.getRoomSize() >= 1){
                 this.leader = this.players[0];
@@ -29,7 +29,7 @@ class Room {
     }
     
     playerExists(player){
-        return this.players.map(x => x.playerID).indexOf(player.playerID) != -1;
+        return this.players.map(x => x.id).indexOf(player.id) != -1;
     }
 
     getRoomSize(){
