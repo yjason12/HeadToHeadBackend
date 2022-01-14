@@ -8,23 +8,30 @@ class RoomHandler {
         this.idToPlayer = {};
     }
 
+    getPlayer(playerID) {
+        return this.idToPlayer[playerID];
+    }
+
+    getNicknameList(){
+        return Object.keys(this.idToPlayer).map(id => this.getPlayer(id).nickname)
+    }
     checkPlayerExists(playerID) {
         return playerID in this.idToPlayer;
     }
 
     checkPlayerHasRoom(playerID) {
-        return this.idToPlayer[playerID]["room"] != null;
+        return this.getPlayer(playerID)["room"] != null;
     }
 
     getRoomIDOfPlayer(playerID) {
         if(!this.checkPlayerExists(playerID) || !this.checkPlayerHasRoom(playerID))
             return
 
-        return this.idToPlayer[playerID]["room"]["id"]
+        return this.getPlayer(playerID)["room"]["id"]
     }
 
     disconnectPlayer(playerID) {
-        this.idToPlayer[playerID].disconnect();
+        this.getPlayer(playerID).disconnect();
     }
 
     deleteRoomIfEmpty(roomID) {
