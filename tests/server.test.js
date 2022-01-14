@@ -15,7 +15,7 @@ describe("simple socket tests", () => {
             clientSocket1.on("connect", () => {
                 clientSocket2.on("connect", () => {
                     clientSocket3.on("connect", () => {
-                        done();
+                        setTimeout(done, 300);
                     })
                 });
             });
