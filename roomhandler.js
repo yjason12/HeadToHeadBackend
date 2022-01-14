@@ -33,6 +33,7 @@ class RoomHandler {
 
         return this.getPlayer(playerID)["room"]["id"]
     }
+    
     getRoomOfPlayer(playerID) {
         if(!this.checkPlayerExists(playerID))
             throw new Error("Player was not found in ID list")
