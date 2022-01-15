@@ -49,6 +49,12 @@ class Util {
             'nicknames': list
         })
     }
+
+    static sendIsLeader(io, ans) {
+        io.emit('updateLeader',{
+            'isLeader' : ans
+        })
+    }
 }
 
 module.exports = Util

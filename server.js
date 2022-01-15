@@ -93,6 +93,17 @@ io.on('connection', function (socket) {
             roomHandler.getPlayer(socket.id).changeNickname(newName);
         }
     });
+
+    socket.on('isLeader',() => {
+        let roomID = roomHandler.getRoomIDOfPlayer(socket.id);
+        let playerIDList = roomHandler.getPlayerIDList(roomID);
+        let leaderID = roomHandler.getLeaderID(roomID);
+        logger.info(`Sent leader info for room ${roomID}`)
+        playerIDList.forEach(playerID => {
+            logger.info(`Sent to ${playerID} value ${playerID == leaderID}`)
+            Util.sendIsLeader(io.to(playerID), playerID == leaderID);
+        });
+    })
 });
 
 http.listen(3001, function () {
@@ -101,4 +112,5 @@ http.listen(3001, function () {
 
 
 const roomRouter = require("./routes/room");
+const { util } = require('config');
 app.use("/room", roomRouter);

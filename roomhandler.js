@@ -16,6 +16,14 @@ class RoomHandler {
         return this.rooms[roomID].players.map(p => p.nickname);
     }
 
+    getPlayerIDList(roomID){
+        return this.rooms[roomID].players.map(p => p.id);
+    }
+
+    getLeaderID(roomID){
+        return this.rooms[roomID].leader.id;
+    }
+
     checkPlayerExists(playerID) {
         return playerID in this.idToPlayer;
     }
