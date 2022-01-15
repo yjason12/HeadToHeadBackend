@@ -81,6 +81,10 @@ class Util {
             'isLeader' : ans
         })
     }
+
+    static updateGameSelect(io, msg) {
+        io.emit('updateGameSelect', msg);
+    }
 }
 
 module.exports = Util

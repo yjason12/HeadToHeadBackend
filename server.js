@@ -122,6 +122,13 @@ io.on('connection', function (socket) {
         isLeaderFunction(roomID);
     })
     
+    socket.on('selectGame', (msg) => {
+        let roomID = roomHandler.getRoomIDOfPlayer(socket.id);
+        let leaderID = roomHandler.getLeaderID(roomID);
+        if(socket.id == leaderID) {
+            Util.updateGameSelect(io.to(roomID),msg);
+        }
+    })
 });
 
 http.listen(3001, function () {
