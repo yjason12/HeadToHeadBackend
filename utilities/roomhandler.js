@@ -65,7 +65,7 @@ class RoomHandler {
             throw new Error("RoomID was not found in rooms list");
         }
         
-        if (this.rooms[roomID].players.length == 0) {//do we want safety checks for if room doesnt exist
+        if (this.rooms[roomID].players.length == 0) {
             delete this.rooms[roomID]
             return true;
         }
