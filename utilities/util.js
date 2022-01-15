@@ -1,5 +1,6 @@
 class Util {
     static isValidRoomID(roomID) {
+        console.log(roomID);
         if (roomID.length < 2 || roomID.length > 15) return false;
         if (!roomID.match(/^[0-9a-zA-Z]+$/)) return false;
         return true;
@@ -9,6 +10,31 @@ class Util {
         if (nickname.length < 1 || nickname.length > 15) return false;
         if (!nickname.match(/^[0-9a-zA-Z]+$/)) return false;
         return true;
+    }
+
+    static isValidRoomTry(roomID, io) {
+        if (!("roomID" in roomID)) {
+            return "Invalid JSON was sent to tryRoom: Missing roomID"
+        }
+        if (!this.isValidRoomID(roomID["roomID"])) {
+            this.sendFailureRoomResult(io, "Invalid room id")
+            return `User attempted to use invalid roomID (${roomID["roomID"]})`
+        }
+        return "Success";
+    }
+
+    static sendFailedJoin(io, message) {
+        io.emit('tryRoom', {
+            "result": "failure",
+            "message": message
+        })
+    }
+
+    static sendSuccessfulJoin(io) {
+        io.emit('tryRoom', {
+            "result": "success",
+            "message": "player joined a room"
+        })
     }
 
     static isValidRoomInfo(roomInfo, io) {

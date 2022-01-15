@@ -1,8 +1,8 @@
-const Player = require('./player')
-const Room = require('./room')
-const RoomHandler = require('./roomhandler');
-const Util = require("./util")
-const logger = require('./logger')
+const Player = require('./classes/player')
+const Room = require('./classes/room')
+const RoomHandler = require('./utilities/roomhandler');
+const Util = require("./utilities/util")
+const logger = require('./utilities/logger')
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require("socket.io")(http, {
@@ -52,14 +52,23 @@ io.on('connection', function (socket) {
         logger.info(`Player (${socket.id}) has been erased`)
     });
 
-    socket.on('roomRequest', (roomInfo) => {
+    socket.on('tryRoom', (roomID) => {
+        logger.info(roomID);
+        const roomIDCheckResult = Util.isValidRoomTry(roomID, io);
+        if (roomIDCheckResult != "Success") {
+            logger.warn(roomIDCheckResult);
+            Util.sendFailedJoin(io.to(socket.id), "Invalid room ID");
+            return;
+        }
+        Util.sendSuccessfulJoin(io.to(socket.id));
+    })
 
+    socket.on('roomRequest', (roomInfo) => {
         const roomInfoCheckResult = Util.isValidRoomInfo(roomInfo, io)
         if(roomInfoCheckResult != "Success") {
             logger.warn(roomInfoCheckResult);
             return
         }
-
         const roomID = roomInfo['roomID'];
         const nickname = roomInfo['nickname'];
 

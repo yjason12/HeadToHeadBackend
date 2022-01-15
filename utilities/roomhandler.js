@@ -1,5 +1,5 @@
-const Room = require("./room");
-const Player = require("./player");
+const Room = require("../classes/room");
+const Player = require("../classes/player");
 const logger = require("./logger");
 
 class RoomHandler {
@@ -81,6 +81,9 @@ class RoomHandler {
     }
 
     createPlayer(id, nickname, roomID) {
+        if (roomID == "") {
+            return;
+        }
         this.createRoomIfNotExist(roomID)
         const player = new Player(id, nickname, this.rooms[roomID]);
         this.idToPlayer[id] = player;
