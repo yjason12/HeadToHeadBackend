@@ -116,10 +116,12 @@ io.on('connection', function (socket) {
             Util.sendIsLeader(io.to(playerID), playerID == leaderID);
         });
     }
+
     socket.on('isLeader', () => {
         let roomID = roomHandler.getRoomIDOfPlayer(socket.id);
         isLeaderFunction(roomID);
     })
+    
 });
 
 http.listen(3001, function () {
