@@ -1,8 +1,8 @@
-const Player = require('./player')
-const Room = require('./room')
-const RoomHandler = require('./roomhandler');
-const Util = require("./util")
-const logger = require('./logger')
+const Player = require('./classes/player')
+const Room = require('./classes/room')
+const RoomHandler = require('./utilities/roomhandler');
+const Util = require("./utilities/util")
+const logger = require('./utilities/logger')
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require("socket.io")(http, {
@@ -48,18 +48,30 @@ io.on('connection', function (socket) {
             logger.info(`${formerRoomID} has been deleted due to lack of players.`);
         } else {
             Util.sendNicknameList(io.to(formerRoomID), roomHandler.getNicknameList(formerRoomID));
+
+
+            isLeaderFunction(formerRoomID);
         }
         logger.info(`Player (${socket.id}) has been erased`)
     });
 
-    socket.on('roomRequest', (roomInfo) => {
+    socket.on('tryRoom', (roomID) => {
+        logger.info(roomID);
+        const roomIDCheckResult = Util.isValidRoomTry(roomID, io);
+        if (roomIDCheckResult != "Success") {
+            logger.warn(roomIDCheckResult);
+            Util.sendFailedJoin(io.to(socket.id), "Invalid room ID");
+            return;
+        }
+        Util.sendSuccessfulJoin(io.to(socket.id));
+    })
 
+    socket.on('roomRequest', (roomInfo) => {
         const roomInfoCheckResult = Util.isValidRoomInfo(roomInfo, io)
         if(roomInfoCheckResult != "Success") {
             logger.warn(roomInfoCheckResult);
             return
         }
-
         const roomID = roomInfo['roomID'];
         const nickname = roomInfo['nickname'];
 
@@ -87,9 +99,36 @@ io.on('connection', function (socket) {
         logger.info(`Sent player list of room ${roomID}`)
     });
 
-    socket.on('updatePlayerNickname', (roomInfo) => {
-
+    socket.on('updatePlayerNickname', (msg) => {
+        let newName = msg['newName'];
+        if(Util.isValidNickname(newName)){
+            roomHandler.getPlayer(socket.id).changeNickname(newName);
+        }
     });
+
+    const isLeaderFunction = (roomID) => {
+        
+        let playerIDList = roomHandler.getPlayerIDList(roomID);
+        let leaderID = roomHandler.getLeaderID(roomID);
+        logger.info(`Sent leader info for room ${roomID}`)
+        playerIDList.forEach(playerID => {
+            logger.info(`Sent to ${playerID} value ${playerID == leaderID}`)
+            Util.sendIsLeader(io.to(playerID), playerID == leaderID);
+        });
+    }
+
+    socket.on('isLeader', () => {
+        let roomID = roomHandler.getRoomIDOfPlayer(socket.id);
+        isLeaderFunction(roomID);
+    })
+    
+    socket.on('selectGame', (msg) => {
+        let roomID = roomHandler.getRoomIDOfPlayer(socket.id);
+        let leaderID = roomHandler.getLeaderID(roomID);
+        if(socket.id == leaderID) {
+            Util.updateGameSelect(io.to(roomID),msg);
+        }
+    })
 });
 
 http.listen(3001, function () {
@@ -98,4 +137,5 @@ http.listen(3001, function () {
 
 
 const roomRouter = require("./routes/room");
+const { util } = require('config');
 app.use("/room", roomRouter);

@@ -1,5 +1,5 @@
-const Room = require("./room");
-const Player = require("./player");
+const Room = require("../classes/room");
+const Player = require("../classes/player");
 const logger = require("./logger");
 
 class RoomHandler {
@@ -16,12 +16,20 @@ class RoomHandler {
         return this.rooms[roomID].players.map(p => p.nickname);
     }
 
+    getPlayerIDList(roomID){
+        return this.rooms[roomID].players.map(p => p.id);
+    }
+
+    getLeaderID(roomID){
+        return this.rooms[roomID].leader.id;
+    }
+
     checkPlayerExists(playerID) {
         return playerID in this.idToPlayer;
     }
 
     checkPlayerHasRoom(playerID) {
-        return this.getPlayer(playerID)["room"] != null;
+        return this.getPlayer(playerID).room != null;
     }
 
     getRoomIDOfPlayer(playerID) {
@@ -31,16 +39,23 @@ class RoomHandler {
         if(!this.checkPlayerHasRoom(playerID))
             throw new Error("Player did not have associated room")
 
-        return this.getPlayer(playerID)["room"]["id"]
+        return this.getPlayer(playerID).room.id
     }
 
     disconnectPlayer(playerID) {
+        if(!this.checkPlayerExists(playerID))
+            throw new Error("Player was not found in ID list")
+
         this.getPlayer(playerID).disconnect();
         delete this.idToPlayer[playerID]
     }
 
     deleteRoomIfEmpty(roomID) {
-        if (this.rooms[roomID]["players"].length == 0) {//do we want safety checks for if room doesnt exist
+        if(!(roomID in this.rooms)){
+            throw new Error("RoomID was not found in rooms list");
+        }
+        
+        if (this.rooms[roomID].players.length == 0) {
             delete this.rooms[roomID]
             return true;
         }
@@ -56,6 +71,9 @@ class RoomHandler {
     }
 
     createPlayer(id, nickname, roomID) {
+        if (roomID == "") {
+            return;
+        }
         this.createRoomIfNotExist(roomID)
         const player = new Player(id, nickname, this.rooms[roomID]);
         this.idToPlayer[id] = player;
