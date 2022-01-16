@@ -46,8 +46,6 @@ io.on('connection', function (socket) {
             logger.info(`${formerRoomID} has been deleted due to lack of players.`);
         } else {
             Util.sendNicknameList(io.to(formerRoomID), roomHandler.getNicknameList(formerRoomID));
-
-
             isLeaderFunction(formerRoomID);
         }
         logger.info(`Player (${socket.id}) has been erased`)
@@ -58,7 +56,6 @@ io.on('connection', function (socket) {
         const roomIDCheckResult = Util.isValidRoomTry(roomID, io);
         if (roomIDCheckResult != "Success") {
             logger.warn(roomIDCheckResult);
-            Util.sendFailedJoin(io.to(socket.id), "Invalid room ID");
             return;
         }
         Util.sendSuccessfulJoin(io.to(socket.id));
@@ -94,23 +91,26 @@ io.on('connection', function (socket) {
     socket.on('getNicknameList', () => {
         let roomID = roomHandler.getRoomIDOfPlayer(socket.id);
         Util.sendNicknameList(io.to(roomID), roomHandler.getNicknameList(roomID));
-        logger.info(`Sent player list of room ${roomID}`)
     });
 
-    socket.on('updatePlayerNickname', (msg) => {
-        let newName = msg['newName'];
+    socket.on('updatePlayerNickname', (nicknameMsg) => {
+        if(!('newName' in nicknameMsg)) { 
+            logger.warn("Invalid nickname object recieved at updatePlayerNickname")
+            return;
+        }
+
+        let newName = nicknameMsg['newName'];
         if(Util.isValidNickname(newName)){
             roomHandler.getPlayer(socket.id).changeNickname(newName);
         }
     });
 
     const isLeaderFunction = (roomID) => {
-        
         let playerIDList = roomHandler.getPlayerIDList(roomID);
         let leaderID = roomHandler.getLeaderID(roomID);
         logger.info(`Sent leader info for room ${roomID}`)
         playerIDList.forEach(playerID => {
-            logger.info(`Sent to ${playerID} value ${playerID == leaderID}`)
+            logger.info(`Sent to ${playerID} value ${playerID == leaderID} for leader check`)
             Util.sendIsLeader(io.to(playerID), playerID == leaderID);
         });
     }
@@ -120,7 +120,12 @@ io.on('connection', function (socket) {
         isLeaderFunction(roomID);
     })
     
-    socket.on('selectGame', (msg) => {
+    socket.on('gameSelected', (gameSelectMsg) => {
+        if(!("game" in gameSelectMsg)) {
+            logger.warn("Invalid gameSelect object recieved at gameSelected");
+            return;
+        }
+
         let roomID = roomHandler.getRoomIDOfPlayer(socket.id);
         let leaderID = roomHandler.getLeaderID(roomID);
         if(socket.id == leaderID) {

@@ -21,7 +21,7 @@ class Room {
         if(player === this.leader){
             if(this.getRoomSize() >= 1){
                 this.leader = this.players[0];
-            } else{
+            } else {
                 this.leader = null;
             }
         }
