@@ -53,7 +53,7 @@ io.on('connection', function (socket) {
 
     socket.on('tryRoom', (roomID) => {
         logger.info(roomID);
-        const roomIDCheckResult = Util.isValidRoomTry(roomID, io);
+        const roomIDCheckResult = Util.isValidRoomTry(io, roomID);
         if (roomIDCheckResult != "Success") {
             logger.warn(roomIDCheckResult);
             return;
@@ -62,7 +62,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on('roomRequest', (roomInfo) => {
-        const roomInfoCheckResult = Util.isValidRoomInfo(roomInfo, io)
+        const roomInfoCheckResult = Util.isValidRoomInfo(io, roomInfo)
         if(roomInfoCheckResult != "Success") {
             logger.warn(roomInfoCheckResult);
             return
@@ -105,20 +105,20 @@ io.on('connection', function (socket) {
         }
     });
 
+    socket.on('isLeader', () => {
+        let roomID = roomHandler.getRoomIDOfPlayer(socket.id);
+        isLeaderFunction(roomID);
+    })
+
     const isLeaderFunction = (roomID) => {
-        let playerIDList = roomHandler.getPlayerIDList(roomID);
-        let leaderID = roomHandler.getLeaderID(roomID);
+        const playerIDList = roomHandler.getPlayerIDList(roomID);
+        const leaderID = roomHandler.getLeaderID(roomID);
         logger.info(`Sent leader info for room ${roomID}`)
         playerIDList.forEach(playerID => {
             logger.info(`Sent to ${playerID} value ${playerID == leaderID} for leader check`)
             Util.sendIsLeader(io.to(playerID), playerID == leaderID);
         });
     }
-
-    socket.on('isLeader', () => {
-        let roomID = roomHandler.getRoomIDOfPlayer(socket.id);
-        isLeaderFunction(roomID);
-    })
     
     socket.on('gameSelected', (gameSelectMsg) => {
         if(!("game" in gameSelectMsg)) {
@@ -126,11 +126,19 @@ io.on('connection', function (socket) {
             return;
         }
 
-        let roomID = roomHandler.getRoomIDOfPlayer(socket.id);
-        let leaderID = roomHandler.getLeaderID(roomID);
+        const roomID = roomHandler.getRoomIDOfPlayer(socket.id);
+        const leaderID = roomHandler.getLeaderID(roomID);
         if(socket.id == leaderID) {
-            Util.updateGameSelect(io.to(roomID),msg);
+            roomHandler.setGameOfRoomID(roomID, gameSelectMsg["game"])
+            Util.updateGameSelect(io.to(roomID), gameSelectMsg);
         }
+    })
+
+    socket.on('getGameSelect', () => {
+        const roomID = roomHandler.getRoomIDOfPlayer(socket.id)
+        Util.updateGameSelect(io.to(roomID), {
+            "game": roomHandler.getGameOfRoomID(roomID)
+        });
     })
 });
 
@@ -140,4 +148,5 @@ http.listen(3001, function () {
 
 
 const roomRouter = require("./routes/room");
+const { updateGameSelect } = require('./utilities/util');
 app.use("/room", roomRouter);

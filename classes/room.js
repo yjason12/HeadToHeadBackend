@@ -3,6 +3,7 @@ class Room {
         this.id = id;
         this.players = [];
         this.leader = null;
+        this.selectedGame = "";
     }
 
     addPlayer(player){
@@ -33,6 +34,14 @@ class Room {
 
     getRoomSize(){
         return this.players.length;
+    }
+
+    setSelectedGame(selectedGame) {
+        this.selectedGame = selectedGame;
+    }
+
+    getSelectedGame() {
+        return this.selectedGame;
     }
 }
 

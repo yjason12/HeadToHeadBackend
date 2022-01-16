@@ -83,6 +83,14 @@ class RoomHandler {
     addPlayerToRoom(playerID, roomID) {//probably not needed since player already assigned to room from the start
         this.rooms[roomID].addPlayer(this.idToPlayer[playerID]);
     }
+
+    getGameOfRoomID(roomID) {
+        return this.rooms[roomID].getSelectedGame();
+    }
+
+    setGameOfRoomID(roomID, selectedGame) {
+        this.rooms[roomID].setSelectedGame(selectedGame);
+    }
 }
 
 module.exports = RoomHandler

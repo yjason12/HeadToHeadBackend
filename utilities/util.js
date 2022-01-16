@@ -12,7 +12,7 @@ class Util {
         return true;
     }
 
-    static isValidRoomTry(roomID, io) {
+    static isValidRoomTry(io, roomID) {
         if (!("roomID" in roomID)) {
             return "Invalid JSON was sent to tryRoom: Missing roomID"
         }
@@ -37,7 +37,7 @@ class Util {
         })
     }
 
-    static isValidRoomInfo(roomInfo, io) {
+    static isValidRoomInfo(io, roomInfo) {
         if (!("roomID" in roomInfo)) {
             return "Invalid JSON was sent to roomRequest: Missing roomID"
         }
