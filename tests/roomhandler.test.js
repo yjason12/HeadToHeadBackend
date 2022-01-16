@@ -1,4 +1,4 @@
-const RoomHandler = require("../roomhandler");
+const RoomHandler = require("../utilities/roomhandler");
 
 describe("room event tests", () => {
     let roomHandler;

@@ -1,5 +1,5 @@
-const Player = require("../player.js");
-const Room = require("../room.js");
+const Player = require("../classes/player");
+const Room = require("../classes/room");
 
 describe("room event tests", () => {
     let room;

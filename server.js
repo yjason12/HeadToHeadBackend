@@ -1,5 +1,3 @@
-const Player = require('./classes/player')
-const Room = require('./classes/room')
 const RoomHandler = require('./utilities/roomhandler');
 const Util = require("./utilities/util")
 const logger = require('./utilities/logger')
@@ -137,5 +135,4 @@ http.listen(3001, function () {
 
 
 const roomRouter = require("./routes/room");
-const { util } = require('config');
 app.use("/room", roomRouter);
