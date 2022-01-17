@@ -9,18 +9,26 @@ class RoomHandler {
     }
 
     getPlayer(playerID) {
+        if(!this.checkPlayerExists(playerID))
+            throw new Error("Player was not found in ID list")
         return this.idToPlayer[playerID];
     }
 
     getNicknameList(roomID){
+        if(!this.checkRoomExists(roomID))
+            throw new Error("Room was not found in room list")
         return this.rooms[roomID].players.map(p => p.nickname);
     }
 
     getPlayerIDList(roomID){
+        if(!this.checkRoomExists(roomID))
+            throw new Error("Room was not found in room list")
         return this.rooms[roomID].players.map(p => p.id);
     }
 
     getLeaderID(roomID){
+        if(!this.checkRoomExists(roomID))
+            throw new Error("Room was not found in room list")
         return this.rooms[roomID].leader.id;
     }
 
@@ -28,7 +36,13 @@ class RoomHandler {
         return playerID in this.idToPlayer;
     }
 
+    checkRoomExists(roomID) {
+        return roomID in this.rooms;
+    }
+
     checkPlayerHasRoom(playerID) {
+        if(!this.checkPlayerExists(playerID))
+            throw new Error("Room was not found in room list")
         return this.getPlayer(playerID).room != null;
     }
 
@@ -51,9 +65,8 @@ class RoomHandler {
     }
 
     deleteRoomIfEmpty(roomID) {
-        if(!(roomID in this.rooms)){
-            throw new Error("RoomID was not found in rooms list");
-        }
+        if(!this.checkRoomExists(roomID))
+            throw new Error("Room was not found in room list")
         
         if (this.rooms[roomID].players.length == 0) {
             delete this.rooms[roomID]
@@ -63,7 +76,7 @@ class RoomHandler {
     }
 
     createRoomIfNotExist(roomID) {
-        if (!(roomID in this.rooms)) {
+        if (!this.checkRoomExists(roomID)) {
             this.rooms[roomID] = new Room(roomID);
             return true;
         }
@@ -81,14 +94,22 @@ class RoomHandler {
     }
 
     addPlayerToRoom(playerID, roomID) {//probably not needed since player already assigned to room from the start
+        if(!this.checkPlayerExists(playerID))
+            throw new Error("Player was not found in player list")
+        if(!this.checkRoomExists(roomID))
+            throw new Error("Room was not found in room list")
         this.rooms[roomID].addPlayer(this.idToPlayer[playerID]);
     }
 
     getGameOfRoomID(roomID) {
+        if(!this.checkRoomExists(roomID))
+            throw new Error("Room was not found in room list")
         return this.rooms[roomID].getSelectedGame();
     }
 
     setGameOfRoomID(roomID, selectedGame) {
+        if(!this.checkRoomExists(roomID))
+            throw new Error("Room was not found in room list")
         this.rooms[roomID].setSelectedGame(selectedGame);
     }
 }
