@@ -158,7 +158,4 @@ http.listen(3001, function () {
     logger.info("Server started listening on *:3001")
 });
 
-
-const roomRouter = require("./routes/room");
 const { updateGameSelect } = require('./utilities/util');
-app.use("/room", roomRouter);
