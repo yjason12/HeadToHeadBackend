@@ -86,7 +86,7 @@ io.on('connection', function (socket) {
         Util.sendNicknameList(io.to(roomID), roomHandler.getNicknameList(roomID));
     });
 
-    socket.on('updateNickname', (nicknameMsg) => {
+    socket.on('setNickname', (nicknameMsg) => {
         if(!roomHandler.checkPlayerExists(socket.id)) {
             logger.warn(`Unknown player ${socket.id} changed nickname somehow`)
             return;
