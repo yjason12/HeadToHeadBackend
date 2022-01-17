@@ -73,9 +73,8 @@ describe("simple socket tests", () => {
 
     test("double join room", (done) => {
         clientSocket1.on("roomRequestResult", checkSuccessRoomRequestResult(() => {
-        makeRoomRequest(clientSocket2, "testroom", "testnickname");
-
-         }));
+            makeRoomRequest(clientSocket2, "testroom", "testnickname");
+        }));
         makeRoomRequest(clientSocket1, "testroom", "testnickname")
         clientSocket2.on("roomRequestResult", checkSuccessRoomRequestResult(done));
 

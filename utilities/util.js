@@ -12,31 +12,6 @@ class Util {
         return true;
     }
 
-    static isValidRoomTry(io, roomID) {
-        if (!("roomID" in roomID)) {
-            return "Invalid JSON was sent to tryRoom: Missing roomID"
-        }
-        if (!this.isValidRoomID(roomID["roomID"])) {
-            this.sendFailureRoomResult(io, "Invalid room id")
-            return `User attempted to use invalid roomID (${roomID["roomID"]})`
-        }
-        return "Success";
-    }
-
-    static sendFailedJoin(io, message) {
-        io.emit('tryRoom', {
-            "result": "failure",
-            "message": message
-        })
-    }
-
-    static sendSuccessfulJoin(io) {
-        io.emit('tryRoom', {
-            "result": "success",
-            "message": "player joined a room"
-        })
-    }
-
     static isValidRoomInfo(io, roomInfo) {
         if (!("roomID" in roomInfo)) {
             return "Invalid JSON was sent to roomRequest: Missing roomID"

@@ -24,13 +24,12 @@ io.on('connection', function (socket) {
     logger.info(`User (${socket.id}) has connected`);
 
     socket.on('disconnect', function () {
-
         if (!roomHandler.checkPlayerExists(socket.id)) {
             logger.warn(`Unrecognized player (${socket.id}) has disconnected (somehow)`);
             return;
         }
 
-        if(!roomHandler.checkPlayerHasRoom(socket.id)) {
+        if (!roomHandler.checkPlayerHasRoom(socket.id)) {
             logger.warn(`Player (${socket.id}) without a room has disconnected (somehow)`);
             return;
         }
@@ -42,7 +41,7 @@ io.on('connection', function (socket) {
 
         roomHandler.disconnectPlayer(socket.id);
 
-        if(roomHandler.deleteRoomIfEmpty(formerRoomID)) {
+        if (roomHandler.deleteRoomIfEmpty(formerRoomID)) {
             logger.info(`${formerRoomID} has been deleted due to lack of players.`);
         } else {
             Util.sendNicknameList(io.to(formerRoomID), roomHandler.getNicknameList(formerRoomID));
@@ -51,33 +50,23 @@ io.on('connection', function (socket) {
         logger.info(`Player (${socket.id}) has been erased`)
     });
 
-    socket.on('tryRoom', (roomID) => {
-        logger.info(roomID);
-        const roomIDCheckResult = Util.isValidRoomTry(io, roomID);
-        if (roomIDCheckResult != "Success") {
-            logger.warn(roomIDCheckResult);
-            return;
-        }
-        Util.sendSuccessfulJoin(io.to(socket.id));
-    })
-
     socket.on('roomRequest', (roomInfo) => {
         const roomInfoCheckResult = Util.isValidRoomInfo(io, roomInfo)
-        if(roomInfoCheckResult != "Success") {
+        if (roomInfoCheckResult != "Success") {
             logger.warn(roomInfoCheckResult);
             return
         }
         const roomID = roomInfo['roomID'];
         const nickname = roomInfo['nickname'];
 
-        if(roomHandler.checkPlayerExists(socket.id)) {
+        if (roomHandler.checkPlayerExists(socket.id)) {
             Util.sendFailureRoomResult(io.to(socket.id), "Already in a room");
             logger.warn(`User (${socket.id}) attempted to join another room (${roomID})`
                 + ` while already being in a room (${roomHandler.getRoomIDOfPlayer(socket.id)})`);
             return;
         }
 
-        if(roomHandler.createRoomIfNotExist(roomID)) {
+        if (roomHandler.createRoomIfNotExist(roomID)) {
             logger.info(`New room ${roomID} has been created`)
         }
 
@@ -88,24 +77,38 @@ io.on('connection', function (socket) {
         logger.info(`Player (${socket.id}) has successfully joined room ${roomID}`);
     });
 
-    socket.on('getNicknameList', () => {
+    socket.on('requestNicknameList', () => {
+        if(!roomHandler.checkPlayerExists(socket.id)) {
+            logger.warn(`Unknown player ${socket.id} requested nickname list`)
+            return;
+        }
         let roomID = roomHandler.getRoomIDOfPlayer(socket.id);
         Util.sendNicknameList(io.to(roomID), roomHandler.getNicknameList(roomID));
     });
 
-    socket.on('updatePlayerNickname', (nicknameMsg) => {
-        if(!('newName' in nicknameMsg)) { 
+    socket.on('updateNickname', (nicknameMsg) => {
+        if(!roomHandler.checkPlayerExists(socket.id)) {
+            logger.warn(`Unknown player ${socket.id} changed nickname somehow`)
+            return;
+        }
+
+        if (!('newName' in nicknameMsg)) {
             logger.warn("Invalid nickname object recieved at updatePlayerNickname")
             return;
         }
 
         let newName = nicknameMsg['newName'];
-        if(Util.isValidNickname(newName)){
+        if (Util.isValidNickname(newName)) {
             roomHandler.getPlayer(socket.id).changeNickname(newName);
         }
     });
 
-    socket.on('isLeader', () => {
+    socket.on('requestLeader', () => {
+        if(!roomHandler.checkPlayerExists(socket.id)) {
+            logger.warn(`Unknown player ${socket.id} requested leader information`);
+            return;
+        }
+
         let roomID = roomHandler.getRoomIDOfPlayer(socket.id);
         isLeaderFunction(roomID);
     })
@@ -119,22 +122,31 @@ io.on('connection', function (socket) {
             Util.sendIsLeader(io.to(playerID), playerID == leaderID);
         });
     }
-    
-    socket.on('gameSelected', (gameSelectMsg) => {
-        if(!("game" in gameSelectMsg)) {
+
+    socket.on('setSelectedGame', (gameSelectMsg) => {
+        if(!roomHandler.checkPlayerExists(socket.id)) {
+            logger.warn(`Unknown player ${socket.id} changed selectedGame`);
+            return;
+        }
+
+        if (!("game" in gameSelectMsg)) {
             logger.warn("Invalid gameSelect object recieved at gameSelected");
             return;
         }
 
         const roomID = roomHandler.getRoomIDOfPlayer(socket.id);
         const leaderID = roomHandler.getLeaderID(roomID);
-        if(socket.id == leaderID) {
+        if (socket.id == leaderID) {
             roomHandler.setGameOfRoomID(roomID, gameSelectMsg["game"])
             Util.updateGameSelect(io.to(roomID), gameSelectMsg);
         }
     })
 
-    socket.on('getGameSelect', () => {
+    socket.on('requestSelectedGame', () => {
+        if(!roomHandler.checkPlayerExists(socket.id)) {
+            logger.warn(`Unknown player ${socket.id} requested selectedGame`);
+            return;
+        }
         const roomID = roomHandler.getRoomIDOfPlayer(socket.id)
         Util.updateGameSelect(io.to(roomID), {
             "game": roomHandler.getGameOfRoomID(roomID)
