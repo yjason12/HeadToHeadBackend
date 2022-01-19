@@ -83,12 +83,12 @@ class RoomHandler {
         return false;
     }
 
-    createPlayer(id, nickname, roomID) {
+    createPlayer(id, nickname, roomID, socket) {
         if (roomID == "") {
             return;
         }
         this.createRoomIfNotExist(roomID)
-        const player = new Player(id, nickname, this.rooms[roomID]);
+        const player = new Player(id, nickname, this.rooms[roomID], socket);
         this.idToPlayer[id] = player;
         this.addPlayerToRoom(id, roomID)
     }
@@ -111,6 +111,10 @@ class RoomHandler {
         if(!this.checkRoomExists(roomID))
             throw new Error("Room was not found in room list")
         this.rooms[roomID].setSelectedGame(selectedGame);
+    }
+
+    startGameInRoom(roomID, io) {
+        this.rooms[roomID].startGame(io);
     }
 }
 
