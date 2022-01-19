@@ -4,8 +4,8 @@ const logger = require("./logger");
 
 class RoomHandler {
     constructor() {
-        this.rooms = {};
-        this.idToPlayer = {};
+        this.rooms = {}; //Dictionary: room id -> room object
+        this.idToPlayer = {}; //Dictionary: Socket id -> player object
     }
 
     getPlayer(playerID) {

@@ -1,7 +1,7 @@
 class Room {
     constructor(id){
         this.id = id;
-        this.players = [];
+        this.players = []; //array of player objects
         this.leader = null;
         this.selectedGame = "";
     }
