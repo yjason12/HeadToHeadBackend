@@ -70,7 +70,7 @@ io.on('connection', function (socket) {
             logger.info(`New room ${roomID} has been created`)
         }
 
-        roomHandler.createPlayer(socket.id, nickname, roomID);
+        roomHandler.createPlayer(socket.id, nickname, roomID, socket);
 
         Util.sendSuccessRoomResult(io.to(socket.id));
         socket.join(roomID);
@@ -151,6 +151,23 @@ io.on('connection', function (socket) {
         Util.updateGameSelect(io.to(roomID), {
             "game": roomHandler.getGameOfRoomID(roomID)
         });
+    })
+
+    socket.on('startSelectedGame', () => {
+       if(!roomHandler.checkPlayerExists(socket.id)){
+         logger.warn(`Unknown player ${socket.id} tried to start game`);
+         return;
+       }
+       if(!roomHandler.checkPlayerHasRoom(socket.id)){
+          logger.warn(`Player ${socket.id} with no room tried to start game`);
+          return;
+       }
+       let roomID = roomHandler.getRoomIDOfPlayer(socket.id);
+       if(roomHandler.getLeaderID(roomID) != socket.id){
+          logger.warn(`Player ${socket.id} tried to start game when they are not leader`);
+          return;
+       }
+       roomHandler.startGameInRoom(roomID, io.to(roomID));
     })
 });
 
