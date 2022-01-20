@@ -1,5 +1,4 @@
 class ReactionTimeGame {
-
     constructor(room, io){
         this.room = room;
         this.scores = {};
@@ -24,3 +23,5 @@ class ReactionTimeGame {
         this.io.emit('reactionTimeEnd');
     }
 }
+
+module.exports = ReactionTimeGame

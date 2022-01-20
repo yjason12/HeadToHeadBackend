@@ -1,4 +1,4 @@
-const reactionTime = require('./games/reactionTimeGame');
+const ReactionTimeGame = require('./games/reactionTimeGame');
 
 class Room {
     constructor(id){
@@ -48,6 +48,7 @@ class Room {
     }
 
     startGame(io) {
+        io.emit("startGame");
         if(this.selectedGame === 'ReactionTime'){
             this.game = new ReactionTimeGame(this, io);
             this.game.start();

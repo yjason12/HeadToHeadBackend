@@ -167,6 +167,14 @@ io.on('connection', function (socket) {
           logger.warn(`Player ${socket.id} tried to start game when they are not leader`);
           return;
        }
+
+       console.log(roomHandler.getGameOfRoomID(roomID) )
+       if(roomHandler.getGameOfRoomID(roomID) == '') {
+          logger.warn(`Room ${roomID} attempted to start game with selecting a game`);
+          return;
+       }
+
+       logger.info(`Starting game in room ${roomID}`)
        roomHandler.startGameInRoom(roomID, io.to(roomID));
     })
 });
