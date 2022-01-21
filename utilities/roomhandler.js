@@ -116,6 +116,12 @@ class RoomHandler {
     startGameInRoom(roomID, io) {
         this.rooms[roomID].startGame(io);
     }
+
+    getStatusOfRoomID(roomID) {
+        if(!this.checkRoomExists(roomID))
+            throw new Error("Room was not found in room list")
+        return this.rooms[roomID].getStatus()
+    }
 }
 
 module.exports = RoomHandler

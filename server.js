@@ -75,6 +75,10 @@ io.on('connection', function (socket) {
         Util.sendSuccessRoomResult(io.to(socket.id));
         socket.join(roomID);
         logger.info(`Player (${socket.id}) has successfully joined room ${roomID}`);
+
+        if(roomHandler.getStatusOfRoomID(roomID) == 'in game') {
+            Util.sendToWaiting(io.to(socket.id));
+        }
     });
 
     socket.on('requestNicknameList', () => {
@@ -168,9 +172,13 @@ io.on('connection', function (socket) {
           return;
        }
 
-       console.log(roomHandler.getGameOfRoomID(roomID) )
        if(roomHandler.getGameOfRoomID(roomID) == '') {
           logger.warn(`Room ${roomID} attempted to start game with selecting a game`);
+          return;
+       }
+
+       if(roomHandler.getStatusOfRoomID(roomID) != 'lobby') {
+          logger.warn(`Room ${roomID} attempted to start game when room was already active`);
           return;
        }
 

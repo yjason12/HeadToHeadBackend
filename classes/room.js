@@ -1,3 +1,4 @@
+const Util = require('../utilities/util');
 const ReactionTimeGame = require('./games/reactionTimeGame');
 
 class Room {
@@ -7,6 +8,7 @@ class Room {
         this.leader = null;
         this.selectedGame = "";
         this.game = null;
+        this.status = "lobby";
     }
 
     addPlayer(player){
@@ -48,11 +50,16 @@ class Room {
     }
 
     startGame(io) {
-        io.emit("startGame");
+        Util.sendToStartGame(io);
+        this.status = "in game"
         if(this.selectedGame === 'ReactionTime'){
             this.game = new ReactionTimeGame(this, io);
             this.game.start();
         }
+    }
+
+    getStatus() {
+        return this.status;
     }
 }
 
