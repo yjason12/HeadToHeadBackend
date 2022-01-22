@@ -68,10 +68,11 @@ class ReactionTimeGame {
 
     finish() {
         this.io.emit('reactionTimeEnd');
-        this.room.status = 'lobby'
+        this.room.status = 'finished'
         this.room.players.forEach(p => {
             p.socket.removeAllListeners('reactionTimeResult')
-            Util.sendToLobby(this.io.to(p.socket.id));
+            //Util.sendToLobby(this.io.to(p.socket.id));
+            Util.changeStatus(this.io.to(p.socket.id), this.room.status)
         })
 
     }
