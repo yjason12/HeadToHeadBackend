@@ -41,13 +41,17 @@ class ReactionTimeGame {
                 }
             })
 
-            console.log(finished)
             if (finished) {
-                console.log("clearing timeout")
                 clearTimeout(timeoutFunc)
-                this.finish();
+                setTimeout(() => {
+                    this.finish();
+                }, 1500);
             }
         }
+    }
+
+    validateScore(scoreMsg) {
+
     }
 
     timeout() {
