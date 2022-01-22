@@ -1,12 +1,13 @@
 const Util = require("../../utilities/util");
 
 class ReactionTimeGame {
-
+    
     constructor(room, io) {
         this.room = room;
         this.scores = {};
         this.totalScores = {}
         this.io = io;
+        this.falseStartPenalty = 50;
         this.room.players.forEach(p => {
             this.totalScores[p] = 0;
             this.scores[p] = 'no score';
@@ -35,6 +36,7 @@ class ReactionTimeGame {
 
         this.room.players.forEach(p => {
             p.socket.on('reactionTimeResult', this.processPlayerResult(endGameTimeout, p));
+            p.socket.on('processFalseStart', this.processFalseStart(p));
         })
 
     }
@@ -42,11 +44,12 @@ class ReactionTimeGame {
     processPlayerResult = (timeoutFunc, p) => {
         return (msg) => {
             let finished = true;
+
             if(this.validateScore(msg))
-                this.scores[p] = msg['score']
+                this.scores[p] += msg['score']
 
             this.room.players.forEach(p => {
-                if (this.scores[p] == 'no score') {
+                if (this.scores[p] == 0) {
                     finished = false;
                 }
             })
@@ -60,6 +63,13 @@ class ReactionTimeGame {
         }
     }
 
+    processFalseStart(p){
+        return () => {
+
+            this.scores[p] += this.falseStartPenalty;
+            
+        };
+    }
     validateScore(scoreMsg) {
         if(!('score' in scoreMsg)) return false;
         if(typeof scoreMsg['score'] != 'number') return false;
@@ -76,8 +86,9 @@ class ReactionTimeGame {
 
     finish() {
         this.room.players.forEach(p => {
-            p.socket.removeAllListeners('reactionTimeResult')
             if(this.scores[p] != 'no score') this.totalScores[p] += this.scores[p];
+            p.socket.removeAllListeners('reactionTimeResult')
+            p.socket.removeAllListeners('processFalseStart')
         })
 
         if(this.count == 0) {
