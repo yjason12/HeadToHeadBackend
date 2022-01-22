@@ -50,7 +50,7 @@ class Room {
     }
 
     startGame(io) {
-        Util.sendToStartGame(io);
+        Util.changeStatus(io, 'in game');
         this.status = "in game"
         if(this.selectedGame === 'ReactionTime'){
             this.game = new ReactionTimeGame(this, io);

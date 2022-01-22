@@ -77,7 +77,7 @@ io.on('connection', function (socket) {
         logger.info(`Player (${socket.id}) has successfully joined room ${roomID}`);
 
         if(roomHandler.getStatusOfRoomID(roomID) == 'in game') {
-            Util.sendToWaiting(io.to(socket.id));
+            Util.changeStatus(io.to(socket.id), 'waiting');
         }
     });
 

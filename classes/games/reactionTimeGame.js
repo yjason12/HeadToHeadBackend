@@ -5,17 +5,25 @@ class ReactionTimeGame {
     constructor(room, io) {
         this.room = room;
         this.scores = {};
+        this.totalScores = {}
         this.io = io;
         this.room.players.forEach(p => {
+            this.totalScores[p] = 0;
             this.scores[p] = 'no score';
         });
+        this.count = 5;
+
+        this.minDelay = 3000;
+        this.maxDelay = 8000;
     }
 
     start() {
-        const minDelay = 3000;
-        const maxDelay = 10000;
         this.io.emit('renderReactionTime');
 
+        this.run(this.minDelay, this.maxDelay);
+    }
+
+    run(minDelay, maxDelay) {
         setTimeout(() => {
             this.io.emit('reactionTimeStart');
         }, Math.floor(Math.random() * (maxDelay - minDelay) + minDelay));
@@ -54,7 +62,7 @@ class ReactionTimeGame {
 
     validateScore(scoreMsg) {
         if(!('score' in scoreMsg)) return false;
-        if(typeof scoreMsg['score'] !== 'number') return false;
+        if(typeof scoreMsg['score'] != 'number') return false;
         if(scoreMsg['score'] <= 0) return false;
         return true;
     }
@@ -67,14 +75,22 @@ class ReactionTimeGame {
     }
 
     finish() {
-        this.io.emit('reactionTimeEnd');
-        this.room.status = 'finished'
         this.room.players.forEach(p => {
             p.socket.removeAllListeners('reactionTimeResult')
-            //Util.sendToLobby(this.io.to(p.socket.id));
-            Util.changeStatus(this.io.to(p.socket.id), this.room.status)
+            if(this.scores[p] != 'no score') this.totalScores[p] += this.scores[p];
         })
 
+        if(this.count == 0) {
+            this.io.emit('reactionTimeEnd');
+            this.room.status = 'scoreboard'
+            this.room.players.forEach(p => {
+                Util.changeStatus(this.io.to(p.socket.id), 'scoreboard')
+            })
+        } else {
+            this.io.emit('resetReactionTime')
+            this.count--;
+            this.run(this.minDelay, this.maxDelay);
+        }
     }
 }
 

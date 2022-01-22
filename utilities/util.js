@@ -62,28 +62,13 @@ class Util {
         io.emit('updateGameSelect', msg);
     }
 
-    static sendToLobby(io) {
-        io.emit('statusChange', {
-            'status': 'lobby'
-        });
-    }
 
     static changeStatus(io, status) {
         io.emit('statusChange', {
             'status': status
         });
     }
-    static sendToStartGame(io) {
-        io.emit('statusChange', {
-            'status': 'in game'
-        });
-    }
 
-    static sendToWaiting(io) {
-        io.emit('statusChange', {
-            'status': 'waiting'
-        })
-    }
 }
 
 module.exports = Util
