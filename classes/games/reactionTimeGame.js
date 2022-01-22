@@ -1,13 +1,14 @@
 const Util = require("../../utilities/util");
 
 class ReactionTimeGame {
-
+    
     constructor(room, io) {
         this.room = room;
         this.scores = {};
         this.io = io;
+        this.falseStartPenalty = 50;
         this.room.players.forEach(p => {
-            this.scores[p] = 'no score';
+            this.scores[p] = 0;
         });
     }
 
@@ -27,6 +28,7 @@ class ReactionTimeGame {
 
         this.room.players.forEach(p => {
             p.socket.on('reactionTimeResult', this.processPlayerResult(endGameTimeout, p));
+            p.socket.on('processFalseStart', this.processFalseStart(p));
         })
 
     }
@@ -34,9 +36,9 @@ class ReactionTimeGame {
     processPlayerResult = (timeoutFunc, p) => {
         return (msg) => {
             let finished = true;
-            this.scores[p] = msg['score']
+            this.scores[p] += msg['score']
             this.room.players.forEach(p => {
-                if (this.scores[p] == 'no score') {
+                if (this.scores[p] == 0) {
                     finished = false;
                 }
             })
@@ -50,6 +52,13 @@ class ReactionTimeGame {
         }
     }
 
+    processFalseStart(p){
+        return () => {
+
+            this.scores[p] += this.falseStartPenalty;
+            
+        };
+    }
     validateScore(scoreMsg) {
 
     }
@@ -66,6 +75,7 @@ class ReactionTimeGame {
         this.room.status = 'finished'
         this.room.players.forEach(p => {
             p.socket.removeAllListeners('reactionTimeResult')
+            p.socket.removeAllListeners('processFalseStart')
             //Util.sendToLobby(this.io.to(p.socket.id));
             Util.changeStatus(this.io.to(p.socket.id), this.room.status)
         })
