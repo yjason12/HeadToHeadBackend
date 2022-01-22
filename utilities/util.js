@@ -21,6 +21,7 @@ class Util {
         if (!("nickname" in roomInfo)) {
             return "Invalid JSON was sent to roomRequest: Missing nickname"
         }
+
         if (!this.isValidRoomID(roomInfo["roomID"])) {
             this.sendFailureRoomResult(io, "Invalid room id")
             return `User attempted to use invalid roomID (${roomInfo["roomID"]})`
@@ -69,6 +70,11 @@ class Util {
         });
     }
 
+    static changeStatus(io, status) {
+        io.emit('statusChange', {
+            'status': status
+        });
+    }
     static sendToStartGame(io) {
         io.emit('statusChange', {
             'status': 'in game'
