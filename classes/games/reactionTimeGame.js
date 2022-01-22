@@ -34,7 +34,9 @@ class ReactionTimeGame {
     processPlayerResult = (timeoutFunc, p) => {
         return (msg) => {
             let finished = true;
-            this.scores[p] = msg['score']
+            if(this.validateScore(msg))
+                this.scores[p] = msg['score']
+
             this.room.players.forEach(p => {
                 if (this.scores[p] == 'no score') {
                     finished = false;
@@ -51,7 +53,10 @@ class ReactionTimeGame {
     }
 
     validateScore(scoreMsg) {
-
+        if(!('score' in scoreMsg)) return false;
+        if(typeof scoreMsg['score'] !== 'number') return false;
+        if(scoreMsg['score'] <= 0) return false;
+        return true;
     }
 
     timeout() {
