@@ -67,6 +67,11 @@ class Util {
         });
     }
 
+    static changeStatus(io, status) {
+        io.emit('statusChange', {
+            'status': status
+        });
+    }
     static sendToStartGame(io) {
         io.emit('statusChange', {
             'status': 'in game'
