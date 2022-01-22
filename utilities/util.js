@@ -1,12 +1,14 @@
 class Util {
     static isValidRoomID(roomID) {
         console.log(roomID);
+        if(!(typeof roomID === 'string' || roomID instanceof String)) return false;
         if (roomID.length < 2 || roomID.length > 15) return false;
         if (!roomID.match(/^[0-9a-zA-Z]+$/)) return false;
         return true;
     }
 
     static isValidNickname(nickname) {
+        if(!(typeof nickname === 'string' || nickname instanceof String)) return false;
         if (nickname.length < 1 || nickname.length > 15) return false;
         if (!nickname.match(/^[0-9a-zA-Z]+$/)) return false;
         return true;
