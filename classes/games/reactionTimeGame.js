@@ -84,6 +84,13 @@ class ReactionTimeGame {
         this.finish();
     }
 
+    determineAndReturnRanking(){
+        keyValuesArray = Object.keys(this.totalScores).map((key) => { return  [key, this.totalScores[key]] });
+        keyValuesArray.sort( (first, second) => {return first[1] - second[1]});
+        rankingList = keyValuesArray.map((e) => { return e[0] });
+        return rankingList;
+    }
+
     finish() {
         this.room.players.forEach(p => {
             if(this.scores[p] != 'no score') this.totalScores[p] += this.scores[p];
@@ -92,7 +99,10 @@ class ReactionTimeGame {
         })
 
         if(this.count == 0) {
-            this.io.emit('reactionTimeEnd');
+            this.io.emit('reactionTimeEnd', {
+                "playerScoreMap": this.totalScores,
+                "playerRankings": this.determineAndReturnRanking()
+            });
             this.room.status = 'scoreboard'
             this.room.players.forEach(p => {
                 Util.changeStatus(this.io.to(p.socket.id), 'scoreboard')
