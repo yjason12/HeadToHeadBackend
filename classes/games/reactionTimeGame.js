@@ -10,7 +10,7 @@ class ReactionTimeGame {
         this.falseStartPenalty = 50;
         this.room.players.forEach(p => {
             this.totalScores[p] = 0;
-            this.scores[p] = 'no score';
+            this.scores[p] = 0;
         });
         this.count = 5;
 
@@ -78,10 +78,15 @@ class ReactionTimeGame {
     }
 
     timeout() {
+        let finished = true;
         this.room.players.forEach(p => {
-            if (this.scores[p] == 'no score') return;
+            if (this.scores[p] == 0) finished = false;
         })
-        this.finish();
+        if(finished) {
+            console.log(this.totalScores);
+            console.log(this.scores);
+            this.finish();
+        }
     }
 
     determineAndReturnRanking(){
@@ -94,24 +99,26 @@ class ReactionTimeGame {
     finish() {
         this.room.players.forEach(p => {
             if(this.scores[p] != 'no score') this.totalScores[p] += this.scores[p];
-            p.socket.removeAllListeners('reactionTimeResult')
-            p.socket.removeAllListeners('processFalseStart')
+            p.socket.removeAllListeners('reactionTimeResult');
+            p.socket.removeAllListeners('processFalseStart');
         })
-
+        
+        if(this.count != 0) {
+            this.io.emit('resetReactionTime');
+            console.log(this.scores)
+            this.count--;
+            this.run(this.minDelay, this.maxDelay);
+        }
         if(this.count == 0) {
             this.io.emit('reactionTimeEnd', {
                 "playerScoreMap": this.totalScores,
                 "playerRankings": this.determineAndReturnRanking()
             });
-            this.room.status = 'scoreboard'
+            this.room.status = 'scoreboard';
             this.room.players.forEach(p => {
-                Util.changeStatus(this.io.to(p.socket.id), 'scoreboard')
+                Util.changeStatus(this.io.to(p.socket.id), 'scoreboard');
             })
-        } else {
-            this.io.emit('resetReactionTime')
-            this.count--;
-            this.run(this.minDelay, this.maxDelay);
-        }
+        } 
     }
 }
 
