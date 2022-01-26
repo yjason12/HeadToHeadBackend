@@ -12,10 +12,10 @@ class ReactionTimeGame {
             this.totalScores[p] = 0;
             this.scores[p] = 0;
         });
-        this.count = 5;
+        this.count = 2;
 
-        this.minDelay = 3000;
-        this.maxDelay = 8000;
+        this.minDelay = 2000;
+        this.maxDelay = 3000;
     }
 
     start() {
@@ -90,9 +90,10 @@ class ReactionTimeGame {
     }
 
     determineAndReturnRanking(){
-        keyValuesArray = Object.keys(this.totalScores).map((key) => { return  [key, this.totalScores[key]] });
+        //console.log(Object.keys(this.totalScores))
+        let keyValuesArray = Object.keys(this.totalScores).map((key) => { return  [key, this.totalScores[key]] });
         keyValuesArray.sort( (first, second) => {return first[1] - second[1]});
-        rankingList = keyValuesArray.map((e) => { return e[0] });
+        var rankingList = keyValuesArray.map((e) => { return e[0].nickname });
         return rankingList;
     }
 
@@ -110,14 +111,17 @@ class ReactionTimeGame {
             this.run(this.minDelay, this.maxDelay);
         }
         if(this.count == 0) {
+            console.log('game finished');
             this.io.emit('reactionTimeEnd', {
                 "playerScoreMap": this.totalScores,
                 "playerRankings": this.determineAndReturnRanking()
             });
+            /*
             this.room.status = 'scoreboard';
             this.room.players.forEach(p => {
                 Util.changeStatus(this.io.to(p.socket.id), 'scoreboard');
             })
+            */
         } 
     }
 }
