@@ -9,10 +9,12 @@ class Room {
         this.selectedGame = "";
         this.game = null;
         this.status = "lobby";
+        this.idToPlayer = {};
     }
 
     addPlayer(player){
         this.players.push(player);
+        this.idToPlayer[player.id] = player
         if(this.leader == null){
             this.leader = player;
         }
@@ -22,7 +24,7 @@ class Room {
         if(!this.playerExists(player)){
             throw new Error("Tried to remove a player that does not exist in room");
         }
-        
+        delete this.idToPlayer[player.id];
         this.players.splice(this.players.map(x => x.id).indexOf(player.id), 1);
         if(player === this.leader){
             if(this.getRoomSize() >= 1){
@@ -37,6 +39,11 @@ class Room {
         return this.players.map(x => x.id).indexOf(player.id) != -1;
     }
 
+    getPlayerNickname(playerID){
+        if(playerID in this.idToPlayer) return this.idToPlayer[playerID].getNickname();
+        console.log('could not find playerid');
+        return "";
+    }
     getRoomSize(){
         return this.players.length;
     }
